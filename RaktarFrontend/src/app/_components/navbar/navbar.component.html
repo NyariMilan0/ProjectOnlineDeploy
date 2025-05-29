@@ -1,0 +1,66 @@
+<!-- Külső konténer (Sidebar Container) -->
+<div class="sidebar-container roboto-condensed" [class.visible]="isVisible" [class.expanded]="isExpanded">
+
+  <!-- Oldalsáv (Sidebar) -->
+  <div class="sidebar" #menuContainer>
+  
+  <!-- Fő menü (Menu Main) -->
+      <a class="menuMain">
+        <img class="navbarCompanyLogo" src="/assets/CompanyLogo.svg" alt="Company Logo">
+        <span class="navbarLogoText">WareTech</span>
+      </a>
+      <hr class="navbarSeparatorLine">
+  
+  <!-- Menü elemek (Menu Items) -->
+      <div class="menu-items">
+        <p>Main</p>
+        <hr class="navbarSeparatorLine">
+        <a routerLink="/storage" class="menu-item">
+          <img class="navbarIcons" src="/assets/DiagramIcon.svg" alt="Storage">
+          <span class="menu-text">Storage</span>
+        </a>
+        <a routerLink="/pallets" class="menu-item">
+          <img class="navbarIcons" src="/assets/PalletIcon.svg" alt="Pallet Management">
+          <span class="menu-text">Pallet Management</span>
+        </a>
+        <a routerLink="/items" class="menu-item">
+          <img class="navbarIcons" src="/assets/Items.svg" alt="Items">
+          <span class="menu-text">Items</span>
+        </a>
+        <a routerLink="/transferRequest" class="menu-item">
+          <i class="fa-solid fa-arrow-right-arrow-left navbarIcons"></i>
+          <span class="menu-text">Transfer Requests</span>
+        </a>
+        <a class="menu-item" (click)="openAdminModal()">
+          <i class="fa-solid fa-screwdriver-wrench navbarIcons"></i>
+          <span class="menu-text">Admin Panel</span>
+        </a>
+        <br>
+        <p>User</p>
+        <hr class="navbarSeparatorLine">
+        <a class="menu-item" (click)="openProfileModal()">
+          <img class="navbarIcons" src="/assets/profileIcon.svg" alt="Profile User">
+          <span class="menu-text">User Profile</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Fő tartalom (Main Content) -->
+  <div class="main-content">
+  
+  <!-- Hamburger menü (Hamburger Menu) -->
+   <!-- Hamburger menü (Hamburger Menu) -->
+<button
+*ngIf="isMobile"
+class="hamburger"
+#hamburgerButton
+(click)="toggleMenu()"
+>
+<i class="fa-solid fa-bars"></i>
+</button>
+
+  
+  <!-- Tartalom beágyazás (Content Projection) -->
+    <ng-content></ng-content>
+  </div>

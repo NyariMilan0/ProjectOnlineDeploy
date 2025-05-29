@@ -1,0 +1,255 @@
+/* Ikonok és animációk (Icons and Animations) */
+.arrow-icon {
+  transition: transform 0.3s ease;
+}
+
+.rotate-up {
+  transform: rotate(-180deg);
+}
+
+.abc-icon {
+  margin-right: 5px;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.abc-icon i {
+  transition: all 0.3s ease;
+}
+
+.abc-button:hover .abc-icon {
+  transform: scale(1.1);
+}
+
+/* Gombok (Buttons) */
+.abc-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  height: 50px;
+  padding: 0 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.open-button {
+  text-align: left;
+  width: 220px;
+  height: 50px;
+}
+
+.open-button:hover {
+  background-color: transparent;
+  border-color: #1D3557;
+}
+
+.details-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  border-radius: 20px;
+  background-color: #A8DADC;
+  color: #1D3557;
+}
+
+.details-button:hover, .close-button:hover {
+  background-color: #457B9D;
+  color: white;
+}
+
+.weight-button {
+  min-width: 80px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.open-button:hover, .abc-button:hover, .weight-button:hover {
+  background-color: #457B9D;
+  border-color: #457B9D;
+  color: white;
+}
+
+.close-button {
+  background-color: #A8DADC;
+  color: #1D3557;
+}
+
+/* Kártyák (Cards) */
+.larger-card {
+  min-height: 200px;
+  width: 100%;
+}
+
+.card-body {
+  position: relative;
+  box-shadow: 2px 2px 5px #a3a3a3;
+  border-radius: 10px;
+}
+
+.card {
+  border: none;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Alapbeállítások (Base Styles) */
+body {
+  overflow-x: hidden;
+}
+
+.main-content {
+  margin-left: 100px;
+}
+
+.container-fluid {
+  background-color: #f0f7f4;
+  min-height: 100vh;
+}
+
+/* Reszponzív média lekérdezések (Responsive Media Queries) */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+/* Szövegek és címek (Text and Titles) */
+.abc-text {
+  font-weight: 500;
+  transition: transform 0.3s ease;
+}
+
+.weight-text {
+  margin-left: 5px;
+}
+
+h2 {
+  color: #1D3557;
+}
+
+.card-title, .card-text, .card-text strong {
+  color: #1D3557;
+  margin-bottom: 0;
+}
+
+.card-text strong {
+  font-weight: 600;
+}
+
+/* Űrlap elemek (Form Elements) */
+.form-select, .weight-button, .abc-button {
+  border-color: #457B9D;
+  color: #1D3557;
+}
+
+.form-select:focus, .weight-button:focus, .abc-button:focus {
+  box-shadow: 0 0 0 0.2rem #A8DADC;
+  outline: none;
+}
+
+.search-input {
+  border-color: #457B9D;
+  color: #1D3557;
+  max-width: 220px;
+  height: 50px;
+}
+
+.search-input:focus {
+  box-shadow: 0 0 0 0.2rem #A8DADC;
+  outline: none;
+  border-color: #457B9D;
+}
+
+.search-input::placeholder {
+  color: #4a5568;
+}
+
+.input-group-text {
+  background-color: #A8DADC;
+  border-color: #457B9D;
+  color: #1D3557;
+  height: 50px;
+}
+
+/* Modál elemek (Modal Elements) */
+.modal-content {
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header, .modal-footer {
+  background-color: #f0f7f4;
+  border: none;
+}
+
+.modal-title {
+  color: #1D3557;
+}
+
+/* Lista és legördülő menü (Lists and Dropdowns) */
+.dropdown-toggle {
+  border-color: #457B9D;
+  color: #1D3557;
+}
+
+.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(77, 171, 247, 0.25);
+  outline: none;
+}
+
+.dropdown-menu {
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  width: 200px;
+}
+
+.form-check-label {
+  color: #4a5568;
+}
+
+.form-check-input:checked {
+  background-color: #457B9D;
+  border-color: #457B9D;
+}
+
+.btn-outline-secondary .bi {
+  color: #4a5568;
+}
+
+/* Egyéb elemek (Miscellaneous) */
+.item-square {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1D3557;
+  font-size: 0.875rem;
+  height: 100px;
+  width: 100px;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #A8DADC;
+  color: #1D3557;
+}
+
+.bg-info.bg-opacity-25 {
+  background-color: rgba(77, 171, 247, 0.25);
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 1rem;
+}

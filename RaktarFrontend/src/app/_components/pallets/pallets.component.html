@@ -1,0 +1,275 @@
+<div class="container-fluid p-0">
+    <!-- Navigációs komponensek (Navigation Components) -->
+  <app-navbar></app-navbar>
+  <app-profile></app-profile>
+  <app-admin-panel></app-admin-panel>
+
+  <!-- Fő tartalom (Main Content) -->
+  <div class="main-content pt-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+          <div class="card shadow-sm mt-4 enhanced-card">
+            <div class="card-body p-4">
+
+<!-- Navigációs fülek (Navigation Tabs) -->
+              <ul class="nav nav-tabs mb-4 custom-nav-tabs" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link" [class.active]="activeTab === 'addRemove'" 
+                     (click)="setActiveTab('addRemove')" data-bs-toggle="tab" href="#addRemove">
+                    <i class="fas fa-plus-circle me-2"></i>Add/Remove
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" [class.active]="activeTab === 'move'" 
+                     (click)="setActiveTab('move')" data-bs-toggle="tab" href="#move">
+                    <i class="fas fa-arrows-alt me-2"></i>Move
+                  </a>
+                </li>
+              </ul>
+
+<!-- Tab tartalmak (Tab Content) -->
+              <div class="tab-content">
+
+<!-- Hozzáadás/Eltávolítás tab (Add/Remove Tab) -->
+                <div class="tab-pane fade" [class.show]="activeTab === 'addRemove'" 
+                     [class.active]="activeTab === 'addRemove'" id="addRemove">
+                  
+<!-- Raklap hozzáadása űrlap (Add Pallet Form) -->
+                     <div class="text-center mb-4">
+                    <h3 class="section-title">Add Pallet to Shelf</h3>
+                  </div>
+                  <form [formGroup]="addPalletForm" (ngSubmit)="onAddPalletSubmit()">
+                    @if (addPalletMessage) {
+                      <div [class]="addPalletMessageClass">
+                        <i class="fas fa-exclamation-circle me-2"></i>{{ addPalletMessage }}
+                      </div>
+                    }
+                    <div class="mb-3">
+                      <label for="itemSearch" class="form-label">Item (SKU - Name)</label>
+                      <div class="input-group">
+                        <span class="input-group-text custom-input-group">
+                          <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="itemSearch" placeholder="Search items..." 
+                               (input)="filterItems($event)">
+                      </div>
+                      <select class="form-control mt-2 custom-input" formControlName="skuCode" 
+                              [class.invalid]="addPalletForm.get('skuCode')?.invalid && addPalletForm.get('skuCode')?.touched">
+                        <option value="" disabled>Select an item</option>
+                        @for (item of filteredItems; track trackByItemId($index, item)) {
+                          <option [value]="item.sku">{{ item.sku }} - {{ item.name }}</option>
+                        }
+                      </select>
+                      <span class="error-text" [class.invalid]="addPalletForm.get('skuCode')?.invalid && addPalletForm.get('skuCode')?.touched"
+                            *ngIf="addPalletForm.get('skuCode')?.invalid && addPalletForm.get('skuCode')?.touched">
+                        Item is required.
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="shelfSearch" class="form-label">Shelf (Name - Location)</label>
+                      <div class="input-group">
+                        <span class="input-group-text custom-input-group">
+                          <i class="fas fa-warehouse"></i>
+                        </span>
+                        <input type="text" class="form-control" id="shelfSearch" placeholder="Search shelves..." 
+                               (input)="filterShelves($event)">
+                      </div>
+                      <select class="form-control mt-2 custom-input" formControlName="shelfId" 
+                              [class.invalid]="addPalletForm.get('shelfId')?.invalid && addPalletForm.get('shelfId')?.touched">
+                        <option value="" disabled>Select a shelf</option>
+                        @for (shelf of filteredShelves; track trackByShelfId($index, shelf)) {
+                          <option [value]="shelf.id">{{ shelf.shelfName }} - {{ shelf.shelfLocation }}</option>
+                        }
+                      </select>
+                      <span class="error-text" [class.invalid]="addPalletForm.get('shelfId')?.invalid && addPalletForm.get('shelfId')?.touched"
+                            *ngIf="addPalletForm.get('shelfId')?.invalid && addPalletForm.get('shelfId')?.touched">
+                        Shelf is required.
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="addPalletHeight" class="form-label">Height (cm)</label>
+                      <div class="input-group">
+                        <span class="input-group-text custom-input-group">
+                          <i class="fas fa-ruler-vertical"></i>
+                        </span>
+                        <input type="number" class="form-control custom-input" id="addPalletHeight" formControlName="height" 
+                               placeholder="Height (e.g., 80)" 
+                               [class.invalid]="addPalletForm.get('height')?.invalid && addPalletForm.get('height')?.touched">
+                      </div>
+                      <span class="error-text" [class.invalid]="addPalletForm.get('height')?.invalid && addPalletForm.get('height')?.touched"
+                            *ngIf="addPalletForm.get('height')?.invalid && addPalletForm.get('height')?.touched">
+                        Height must be at least 1 cm.
+                      </span>
+                    </div>
+                    <button type="submit" class="btn custom-btn w-100" 
+                            [disabled]="addPalletForm.invalid || isAddLoading">
+                      {{ isAddLoading ? 'Adding...' : 'Add Pallet' }}
+                    </button>
+                  </form>
+
+<!-- Raklap eltávolítása űrlap (Remove Pallet Form) -->
+                  <div class="text-center mt-5 mb-4">
+                    <h3 class="section-title">Remove Pallet from Shelf</h3>
+                  </div>
+                  <form [formGroup]="removePalletForm" (ngSubmit)="onRemovePalletSubmit()">
+                    @if (removePalletMessage) {
+                      <div [class]="removePalletMessageClass">
+                        <i class="fas fa-exclamation-circle me-2"></i>{{ removePalletMessage }}
+                      </div>
+                    }
+                    <div class="mb-3">
+                      <label for="removeShelfSearch" class="form-label">Shelf (Name - Location)</label>
+                      <div class="input-group">
+                        <span class="input-group-text custom-input-group">
+                          <i class="fas fa-warehouse"></i>
+                        </span>
+                        <input type="text" class="form-control" id="removeShelfSearch" placeholder="Search shelves..." 
+                               (input)="filterShelves($event)">
+                      </div>
+                      <select class="form-control mt-2 custom-input" formControlName="shelfId" 
+                              [class.invalid]="removePalletForm.get('shelfId')?.invalid && removePalletForm.get('shelfId')?.touched"
+                              (change)="onShelfChange($event)">
+                        <option value="" disabled>Select a shelf</option>
+                        @for (shelf of filteredShelvesWithPallets; track trackByShelfId($index, shelf)) {
+                          <option [value]="shelf.id">{{ shelf.shelfName }} - {{ shelf.shelfLocation }}</option>
+                        }
+                      </select>
+                      <span class="error-text" [class.invalid]="removePalletForm.get('shelfId')?.invalid && removePalletForm.get('shelfId')?.touched"
+                            *ngIf="removePalletForm.get('shelfId')?.invalid && removePalletForm.get('shelfId')?.touched">
+                        Shelf is required.
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="removePalletId" class="form-label">Pallet</label>
+                      <div class="input-group">
+                        <span class="input-group-text custom-input-group">
+                          <i class="fas fa-pallet"></i>
+                        </span>
+                        <select class="form-control custom-input" formControlName="palletId" 
+                                [class.invalid]="removePalletForm.get('palletId')?.invalid && removePalletForm.get('palletId')?.touched">
+                          <option value="" disabled>Select a pallet</option>
+                          @for (pallet of filteredPalletsForRemoval; track trackByPalletId($index, pallet)) {
+                            <option [value]="pallet.palletId">{{ pallet.palletName }}</option>
+                          }
+                        </select>
+                      </div>
+                      <span class="error-text" [class.invalid]="removePalletForm.get('palletId')?.invalid && removePalletForm.get('palletId')?.touched"
+                            *ngIf="removePalletForm.get('palletId')?.invalid && removePalletForm.get('palletId')?.touched">
+                        Pallet is required.
+                      </span>
+                    </div>
+                    <button type="submit" class="btn custom-btn remove-btn w-100" 
+                            [disabled]="removePalletForm.invalid || isRemoveLoading">
+                      {{ isRemoveLoading ? 'Removing...' : 'Remove Pallet' }}
+                    </button>
+                  </form>
+                </div>
+
+<!-- Mozgatás tab (Move Tab) -->
+                <div class="tab-pane fade" [class.show]="activeTab === 'move'" 
+                     [class.active]="activeTab === 'move'" id="move">
+
+<!-- Raklap mozgatása űrlap (Move Pallet Form) -->
+                     <div class="text-center mb-4">
+                    <h3 class="section-title">Move Pallet to Another Shelf</h3>
+                  </div>
+                  <form [formGroup]="movePalletForm" (ngSubmit)="onMovePalletSubmit()">
+                    @if (movePalletMessage) {
+                      <div [class]="movePalletMessageClass">
+                        <i class="fas fa-exclamation-circle me-2"></i>{{ movePalletMessage }}
+                      </div>
+                    }
+                    <input type="hidden" formControlName="userId">
+                    <div class="mb-3">
+                      <label for="sourceShelfId" class="form-label">Source Shelf</label>
+                      <div class="input-group">
+                        <span class="input-group-text custom-input-group">
+                          <i class="fas fa-warehouse"></i>
+                        </span>
+                        <select class="form-control custom-input" formControlName="sourceShelfId" 
+                                [class.invalid]="movePalletForm.get('sourceShelfId')?.invalid && movePalletForm.get('sourceShelfId')?.touched"
+                                (change)="onSourceShelfChange($event)">
+                          <option value="" disabled>Select a source shelf</option>
+                          @for (shelf of filteredShelvesWithPallets; track trackByShelfId($index, shelf)) {
+                            <option [value]="shelf.id">{{ shelf.shelfName }} - {{ shelf.shelfLocation }}</option>
+                          }
+                        </select>
+                      </div>
+                      <span class="error-text" [class.invalid]="movePalletForm.get('sourceShelfId')?.invalid && movePalletForm.get('sourceShelfId')?.touched"
+                            *ngIf="movePalletForm.get('sourceShelfId')?.invalid && movePalletForm.get('sourceShelfId')?.touched">
+                        Source shelf is required.
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="palletId" class="form-label">Pallet</label>
+                      <div class="input-group">
+                        <span class="input-group-text custom-input-group">
+                          <i class="fas fa-pallet"></i>
+                        </span>
+                        <select class="form-control custom-input" formControlName="palletId" 
+                                [class.invalid]="movePalletForm.get('palletId')?.invalid && movePalletForm.get('palletId')?.touched">
+                          <option value="" disabled>Select a pallet</option>
+                          @for (pallet of filteredPalletsForMove; track trackByPalletId($index, pallet)) {
+                            <option [value]="pallet.palletId">{{ pallet.palletName }} (Shelf: {{ pallet.shelfName }})</option>
+                          }
+                        </select>
+                      </div>
+                      <span class="error-text" [class.invalid]="movePalletForm.get('palletId')?.invalid && movePalletForm.get('palletId')?.touched"
+                            *ngIf="movePalletForm.get('palletId')?.invalid && movePalletForm.get('palletId')?.touched">
+                        Pallet is required.
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="targetStorageId" class="form-label">Target Storage</label>
+                      <div class="input-group">
+                        <span class="input-group-text custom-input-group">
+                          <i class="fas fa-warehouse"></i>
+                        </span>
+                        <select class="form-control custom-input" formControlName="targetStorageId" 
+                                [class.invalid]="movePalletForm.get('targetStorageId')?.invalid && movePalletForm.get('targetStorageId')?.touched"
+                                (change)="onTargetStorageChange($event)">
+                          <option value="" disabled>Select a target storage</option>
+                          @for (storage of storages; track trackByStorageId($index, storage)) {
+                            <option [value]="storage.id">{{ storage.storageName }}</option>
+                          }
+                        </select>
+                      </div>
+                      <span class="error-text" [class.invalid]="movePalletForm.get('targetStorageId')?.invalid && movePalletForm.get('targetStorageId')?.touched"
+                            *ngIf="movePalletForm.get('targetStorageId')?.invalid && movePalletForm.get('targetStorageId')?.touched">
+                        Target storage is required.
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="targetShelfId" class="form-label">Target Shelf</label>
+                      <div class="input-group">
+                        <span class="input-group-text custom-input-group">
+                          <i class="fas fa-warehouse"></i>
+                        </span>
+                        <select class="form-control custom-input" formControlName="targetShelfId" 
+                                [class.invalid]="movePalletForm.get('targetShelfId')?.invalid && movePalletForm.get('targetShelfId')?.touched">
+                          <option value="" disabled>Select a target shelf</option>
+                          @for (shelf of filteredAvailableShelves; track trackByShelfId($index, shelf)) {
+                            <option [value]="shelf.id">{{ shelf.shelfName }} - {{ shelf.shelfLocation }}</option>
+                          }
+                        </select>
+                      </div>
+                      <span class="error-text" [class.invalid]="movePalletForm.get('targetShelfId')?.invalid && movePalletForm.get('targetShelfId')?.touched"
+                            *ngIf="movePalletForm.get('targetShelfId')?.invalid && movePalletForm.get('targetShelfId')?.touched">
+                        Target shelf is required.
+                      </span>
+                    </div>
+                    <button type="submit" class="btn custom-btn w-100" 
+                            [disabled]="movePalletForm.invalid || isMoveLoading">
+                      {{ isMoveLoading ? 'Moving...' : 'Move Pallet' }}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

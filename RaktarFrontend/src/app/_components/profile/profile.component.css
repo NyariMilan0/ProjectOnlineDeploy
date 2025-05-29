@@ -1,0 +1,241 @@
+/* Külső konténer (Modal Container) */
+.custom-modal-dialog {
+    max-width: 900px;
+}
+
+.custom-modal-content {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.custom-modal-body {
+    background-color: #A8DADC;
+}
+
+.custom-width {
+    max-width: 300px;
+}
+
+/* Felugró ablak tartalma (Modal Body) */
+.belsobox {
+    background-color: #F1FAEE;
+    border-radius: 15px;
+    border: 2px #457B9D solid;
+    padding: 10px;
+}
+
+/* Felugró ablak fejléce (Modal Header) */
+.popup-header {
+    color: #1D3557;
+    background-color: #A8DADC;
+    border-bottom: 0px;
+    width: auto;
+    padding: 15px 15px 0px 15px;
+}
+
+.closeButtonContainer {
+    text-align: right;
+}
+
+.modal-title {
+    text-align: center;
+    padding-left: 120px;
+    padding-top: 10px;
+}
+
+.closeButton {
+    background-color: #F1FAEE;
+    border-radius: 12px;
+    padding: 1px 12px;
+    width: auto;
+    border: 2px solid #457B9D;
+    font-size: 28px;
+    color: #1D3557;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.closeButton:hover {
+    background-color: #E63946;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+/* Profil információk (Profile Information) */
+.middleDiv {
+    padding: 20px 30px;
+    background-color: #a8dadc5e;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid #E0E0E0;
+    margin: 15px 0;
+    font-family: 'Roboto', sans-serif;
+    width: 400px;
+}
+
+.middleDiv p {
+    margin-bottom: 0;
+    padding: 12px 15px;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #1D3557;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
+    white-space: nowrap;
+}
+
+.middleDiv p:hover {
+    background-color: #F1FAEE;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.middleDiv p span {
+    color: #457B9D;
+}
+
+.middleDiv p:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.profileImg {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    box-shadow: 4px 4px 4px 0px rgba(0,0,0,0.25);
+    -webkit-box-shadow: 4px 4px 4px 0px rgba(0,0,0,0.25);
+    -moz-box-shadow: 4px 4px 4px 0px rgba(0,0,0,0.25);
+}
+
+.profileImg:hover {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.25);
+    -webkit-box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.25);
+    -moz-box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.25);
+}
+
+.col-6 {
+    padding-top: 50px;
+}
+
+/* Szerkesztési űrlapok és gombok (Edit Forms and Buttons) */
+.informations {
+    align-items: flex-end;
+    padding-left: 30px;
+}
+
+.custom-input.invalid {
+    border-color: red;
+}
+
+.error-text {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid red;
+    border-radius: 4px;
+}
+
+.success-message {
+    color: green;
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid green;
+    border-radius: 4px;
+}
+
+.success-message i, .error-message i {
+    margin-right: 5px;
+}
+
+input {
+    align-items: center;
+    width: 98%;
+    height: auto;
+    border: 1px solid #457B9D; 
+    border-radius: 10px;
+    box-shadow: 1px 2px 3px rgba(69, 123, 157, 0.3); 
+    color: #1D3557; 
+    background-color: #FFFFFF; 
+    padding: 10px; 
+    font-size: 16px; 
+    transition: all 0.3s ease; 
+}
+
+input:focus {
+    border-color: #1D3557; 
+    background-color: #F1FAEE;
+    box-shadow: 0 0 5px rgba(29, 53, 87, 0.5); 
+}
+
+.profileButtons {
+    text-align: center;
+}
+
+.updateButton, .editButton {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    border: 2px solid #457B9D;
+    border-radius: 10px;
+    padding: 6px 20px;
+    background-color: #F1FAEE;
+    font-weight: 600;
+    color: #1D3557;
+    transition: all 0.3s ease;
+}
+
+.updateButton:hover, .editButton:hover {
+    background-color: #457B9D;
+    color: #F1FAEE;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+/* Kijelentkezés gomb (Sign Out Button) */
+.signOutButton {
+    float: right;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    border: 2px solid rgb(170, 0, 0);
+    border-radius: 10px;
+    background-color: #E63946;
+    font-weight: 600;
+    color: #F1FAEE;
+    padding: 6px 20px;
+    transition: all 0.3s ease;
+}
+
+.signOutButton:hover {
+    background-color: #D32F2F;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+.buttonDiv {
+    padding-bottom: 23px;
+    padding-right: 70px;
+}
+
+/* Egyéb stílusok (General Styles) */
+p {
+    font-weight: 500;
+}
+
+button {
+    border-radius: 10px;
+}

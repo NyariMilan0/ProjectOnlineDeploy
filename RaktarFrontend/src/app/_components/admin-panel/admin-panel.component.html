@@ -1,0 +1,717 @@
+<div class="roboto-condensed">
+  <div class="modal fade" id="adminPanelModal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'"
+       [attr.inert]="!showModal ? '' : null" tabindex="-1" aria-labelledby="adminPanelModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg custom-modal-dialog">
+      <div class="modal-content shadow custom-modal-content">
+        <div class="popup-header">
+          <div class="row">
+            <div class="col-10">
+              <h5 class="modal-title">Admin Control Panel</h5>
+            </div>
+            <div class="closeButtonContainer col-2">
+              <button class="closeButton" (click)="closeModal()">×</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-body custom-modal-body">
+          <div class="belsobox">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'registerUser'" (click)="setActiveTab('registerUser')"
+                   data-bs-toggle="tab" href="#registerUser">Register User</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'registerAdmin'" (click)="setActiveTab('registerAdmin')"
+                   data-bs-toggle="tab" href="#registerAdmin">Register Admin</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'addItems'" (click)="setActiveTab('addItems')"
+                   data-bs-toggle="tab" href="#addItems">Add Items</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'addStorage'" (click)="setActiveTab('addStorage')"
+                   data-bs-toggle="tab" href="#addStorage">Add Storage</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'addShelf'" (click)="setActiveTab('addShelf')"
+                   data-bs-toggle="tab" href="#addShelf">Add Shelf</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'deleteShelf'" (click)="setActiveTab('deleteShelf')"
+                   data-bs-toggle="tab" href="#deleteShelf">Delete Shelf</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'deleteStorage'" (click)="setActiveTab('deleteStorage')"
+                   data-bs-toggle="tab" href="#deleteStorage">Delete Storage</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'deleteUser'" (click)="setActiveTab('deleteUser')"
+                   data-bs-toggle="tab" href="#deleteUser">Delete User</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [class.active]="activeTab === 'movementRequests'" (click)="setActiveTab('movementRequests')"
+                   data-bs-toggle="tab" href="#movementRequests">Movement Requests</a>
+              </li>
+            </ul>
+
+            <div class="tab-content mt-3">
+              <!-- Register User Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'registerUser'" id="registerUser">
+                <div class="register-section">
+                  <div class="text-center">
+                    <h3 class="mb-4">Register User</h3>
+                    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="User Avatar" class="avatar mb-3">
+                  </div>
+                  <form [formGroup]="userForm" (ngSubmit)="onUserSubmit()">
+                    @if (userMessage) {
+                      <div [class]="userMessageClass">
+                        <i class="fas fa-exclamation-circle"></i> {{ userMessage }}
+                      </div>
+                    }
+                    <div class="mb-3">
+                      <label for="userUsername" class="form-label">Username</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="userForm.get('userName')?.invalid && userForm.get('userName')?.touched"
+                             id="userUsername" formControlName="userName" placeholder="Username">
+                      <span class="error-text" *ngIf="userForm.get('userName')?.invalid && userForm.get('userName')?.touched">
+                        {{ getErrorMessage(userForm.get('userName'), 'Username') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="userFirstName" class="form-label">First Name</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched"
+                             id="userFirstName" formControlName="firstName" placeholder="First Name">
+                      <span class="error-text" *ngIf="userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched">
+                        {{ getErrorMessage(userForm.get('firstName'), 'First Name') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="userLastName" class="form-label">Last Name</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched"
+                             id="userLastName" formControlName="lastName" placeholder="Last Name">
+                      <span class="error-text" *ngIf="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched">
+                        {{ getErrorMessage(userForm.get('lastName'), 'Last Name') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="userEmail" class="form-label">Email</label>
+                      <input type="email" class="form-control custom-input"
+                             [class.invalid]="userForm.get('email')?.invalid && userForm.get('email')?.touched"
+                             id="userEmail" formControlName="email" placeholder="Email">
+                      <span class="error-text" *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched">
+                        {{ getErrorMessage(userForm.get('email'), 'Email') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="userPassword" class="form-label">Password</label>
+                      <input type="password" class="form-control custom-input"
+                             [class.invalid]="userForm.get('password')?.invalid && userForm.get('password')?.touched"
+                             id="userPassword" formControlName="password" placeholder="Password">
+                      <span class="error-text" *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched">
+                        {{ getErrorMessage(userForm.get('password'), 'Password') }}
+                      </span>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100" [disabled]="userForm.invalid">Register</button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Register Admin Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'registerAdmin'" id="registerAdmin">
+                <div class="register-section">
+                  <div class="text-center">
+                    <h3 class="mb-4">Register Admin</h3>
+                    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Admin Avatar" class="avatar mb-3">
+                  </div>
+                  <form [formGroup]="adminForm" (ngSubmit)="onAdminSubmit()">
+                    @if (adminMessage) {
+                      <div [class]="adminMessageClass">
+                        <i class="fas fa-exclamation-circle"></i> {{ adminMessage }}
+                      </div>
+                    }
+                    <div class="mb-3">
+                      <label for="adminUsername" class="form-label">Username</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="adminForm.get('userName')?.invalid && adminForm.get('userName')?.touched"
+                             id="adminUsername" formControlName="userName" placeholder="Username">
+                      <span class="error-text" *ngIf="adminForm.get('userName')?.invalid && adminForm.get('userName')?.touched">
+                        {{ getErrorMessage(adminForm.get('userName'), 'Username') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="adminFirstName" class="form-label">First Name</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched"
+                             id="adminFirstName" formControlName="firstName" placeholder="First Name">
+                      <span class="error-text" *ngIf="adminForm.get('firstName')?.invalid && adminForm.get('firstName')?.touched">
+                        {{ getErrorMessage(adminForm.get('firstName'), 'First Name') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="adminLastName" class="form-label">Last Name</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched"
+                             id="adminLastName" formControlName="lastName" placeholder="Last Name">
+                      <span class="error-text" *ngIf="adminForm.get('lastName')?.invalid && adminForm.get('lastName')?.touched">
+                        {{ getErrorMessage(adminForm.get('lastName'), 'Last Name') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="adminEmail" class="form-label">Email</label>
+                      <input type="email" class="form-control custom-input"
+                             [class.invalid]="adminForm.get('email')?.invalid && adminForm.get('email')?.touched"
+                             id="adminEmail" formControlName="email" placeholder="Email">
+                      <span class="error-text" *ngIf="adminForm.get('email')?.invalid && adminForm.get('email')?.touched">
+                        {{ getErrorMessage(adminForm.get('email'), 'Email') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="adminPassword" class="form-label">Password</label>
+                      <input type="password" class="form-control custom-input"
+                             [class.invalid]="adminForm.get('password')?.invalid && adminForm.get('password')?.touched"
+                             id="adminPassword" formControlName="password" placeholder="Password">
+                      <span class="error-text" *ngIf="adminForm.get('password')?.invalid && adminForm.get('password')?.touched">
+                        {{ getErrorMessage(adminForm.get('password'), 'Password') }}
+                      </span>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100" [disabled]="adminForm.invalid">Register</button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Add Items Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'addItems'" id="addItems">
+                <div class="register-section">
+                  <div class="text-center">
+                    <h3 class="mb-4">Add Item</h3>
+                  </div>
+                  <form [formGroup]="itemForm" (ngSubmit)="onItemSubmit()">
+                    @if (itemMessage) {
+                      <div [class]="itemMessageClass">
+                        <i class="fas fa-exclamation-circle"></i> {{ itemMessage }}
+                      </div>
+                    }
+                    <div class="mb-3">
+                      <label for="itemSku" class="form-label">SKU</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="itemForm.get('sku')?.invalid && itemForm.get('sku')?.touched" id="itemSku"
+                             formControlName="sku" placeholder="SKU (e.g., ITEM002)">
+                      <span class="error-text" *ngIf="itemForm.get('sku')?.invalid && itemForm.get('sku')?.touched">
+                        {{ getErrorMessage(itemForm.get('sku'), 'SKU') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="itemType" class="form-label">Type</label>
+                      <select class="form-control custom-input"
+                              [class.invalid]="itemForm.get('type')?.invalid && itemForm.get('type')?.touched" id="itemType"
+                              formControlName="type">
+                        <option value="" disabled selected>Select a type</option>
+                        <option value="Metal">Metal</option>
+                        <option value="Plastic">Plastic</option>
+                        <option value="Wood">Wood</option>
+                        <option value="Titanium">Titanium</option>
+                      </select>
+                      <span class="error-text" *ngIf="itemForm.get('type')?.invalid && itemForm.get('type')?.touched">
+                        {{ getErrorMessage(itemForm.get('type'), 'Type') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="itemName" class="form-label">Name</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="itemForm.get('name')?.invalid && itemForm.get('name')?.touched" id="itemName"
+                             formControlName="name" placeholder="Name (e.g., Wooden Box)">
+                      <span class="error-text" *ngIf="itemForm.get('name')?.invalid && itemForm.get('name')?.touched">
+                        {{ getErrorMessage(itemForm.get('name'), 'Name') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="itemAmount" class="form-label">Amount</label>
+                      <input type="number" class="form-control custom-input"
+                             [class.invalid]="itemForm.get('amount')?.invalid && itemForm.get('amount')?.touched"
+                             id="itemAmount" formControlName="amount" placeholder="Amount (e.g., 10)">
+                      <span class="error-text" *ngIf="itemForm.get('amount')?.invalid && itemForm.get('amount')?.touched">
+                        {{ getErrorMessage(itemForm.get('amount'), 'Amount') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="itemPrice" class="form-label">Price</label>
+                      <input type="number" class="form-control custom-input"
+                             [class.invalid]="itemForm.get('price')?.invalid && itemForm.get('price')?.touched"
+                             id="itemPrice" formControlName="price" placeholder="Price (e.g., 19)">
+                      <span class="error-text" *ngIf="itemForm.get('price')?.invalid && itemForm.get('price')?.touched">
+                        {{ getErrorMessage(itemForm.get('price'), 'Price') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="itemWeight" class="form-label">Weight (kg)</label>
+                      <input type="number" class="form-control custom-input"
+                             [class.invalid]="itemForm.get('weight')?.invalid && itemForm.get('weight')?.touched"
+                             id="itemWeight" formControlName="weight" placeholder="Weight (e.g., 5.5)">
+                      <span class="error-text" *ngIf="itemForm.get('weight')?.invalid && itemForm.get('weight')?.touched">
+                        {{ getErrorMessage(itemForm.get('weight'), 'Weight') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="itemSize" class="form-label">Size (m³)</label>
+                      <input type="number" class="form-control custom-input"
+                             [class.invalid]="itemForm.get('size')?.invalid && itemForm.get('size')?.touched" id="itemSize"
+                             formControlName="size" placeholder="Size (e.g., 2.0)">
+                      <span class="error-text" *ngIf="itemForm.get('size')?.invalid && itemForm.get('size')?.touched">
+                        {{ getErrorMessage(itemForm.get('size'), 'Size') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="itemDescription" class="form-label">Description</label>
+                      <input type="text" class="form-control custom-input" id="itemDescription"
+                             formControlName="description" placeholder="Description (e.g., A small wooden box for storage)">
+                      <span class="error-text" *ngIf="itemForm.get('description')?.invalid && itemForm.get('description')?.touched">
+                        {{ getErrorMessage(itemForm.get('description'), 'Description') }}
+                      </span>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100" [disabled]="itemForm.invalid">Add Item</button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Add Storage Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'addStorage'" id="addStorage">
+                <div class="register-section">
+                  <div class="text-center">
+                    <h3 class="mb-4">Add Storage</h3>
+                  </div>
+                  <form [formGroup]="storageForm" (ngSubmit)="onStorageSubmit()">
+                    @if (storageMessage) {
+                      <div [class]="storageMessageClass">
+                        <i class="fas fa-exclamation-circle"></i> {{ storageMessage }}
+                      </div>
+                    }
+                    <div class="mb-3">
+                      <label for="storageName" class="form-label">Storage Name</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="storageForm.get('storageName')?.invalid && storageForm.get('storageName')?.touched"
+                             id="storageName" formControlName="storageName" placeholder="Storage Name (e.g., Raktar_01)">
+                      <span class="error-text" *ngIf="storageForm.get('storageName')?.invalid && storageForm.get('storageName')?.touched">
+                        {{ getErrorMessage(storageForm.get('storageName'), 'Storage Name') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="storageLocation" class="form-label">Location</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="storageForm.get('location')?.invalid && storageForm.get('location')?.touched"
+                             id="storageLocation" formControlName="location" placeholder="Location (e.g., B-1)">
+                      <span class="error-text" *ngIf="storageForm.get('location')?.invalid && storageForm.get('location')?.touched">
+                        {{ getErrorMessage(storageForm.get('location'), 'Location') }}
+                      </span>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100" [disabled]="storageForm.invalid">Add Storage</button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Add Shelf Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'addShelf'" id="addShelf">
+                <div class="register-section">
+                  <div class="text-center">
+                    <h3 class="mb-4">Add Shelf</h3>
+                  </div>
+                  <form [formGroup]="shelfForm" (ngSubmit)="onShelfSubmit()">
+                    @if (shelfMessage) {
+                      <div [class]="shelfMessageClass">
+                        <i class="fas fa-exclamation-circle"></i> {{ shelfMessage }}
+                      </div>
+                    }
+                    <div class="mb-3">
+                      <label for="storageId" class="form-label">Storage</label>
+                      <select class="form-control custom-input"
+                              [class.invalid]="shelfForm.get('storageId')?.invalid && shelfForm.get('storageId')?.touched"
+                              id="storageId" formControlName="storageId">
+                        <option value="" disabled>Select a storage</option>
+                        @for (storage of storages; track storage.id) {
+                          <option [value]="storage.id">{{ storage.storageName }}</option>
+                        }
+                      </select>
+                      <span class="error-text" *ngIf="shelfForm.get('storageId')?.invalid && shelfForm.get('storageId')?.touched">
+                        {{ getErrorMessage(shelfForm.get('storageId'), 'Storage') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="shelfName" class="form-label">Shelf Name</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="shelfForm.get('shelfName')?.invalid && shelfForm.get('shelfName')?.touched"
+                             id="shelfName" formControlName="shelfName" placeholder="Shelf Name (e.g., Polc_02)">
+                      <span class="error-text" *ngIf="shelfForm.get('shelfName')?.invalid && shelfForm.get('shelfName')?.touched">
+                        {{ getErrorMessage(shelfForm.get('shelfName'), 'Shelf Name') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="locationIn" class="form-label">Location In Storage</label>
+                      <input type="text" class="form-control custom-input"
+                             [class.invalid]="shelfForm.get('locationIn')?.invalid && shelfForm.get('locationIn')?.touched"
+                             id="locationIn" formControlName="locationIn" placeholder="Location In (e.g., A-13)">
+                      <span class="error-text" *ngIf="shelfForm.get('locationIn')?.invalid && shelfForm.get('locationIn')?.touched">
+                        {{ getErrorMessage(shelfForm.get('locationIn'), 'Location In Storage') }}
+                      </span>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100" [disabled]="shelfForm.invalid">Add Shelf</button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Delete Shelf Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'deleteShelf'" id="deleteShelf">
+                <div class="register-section">
+                  <div class="text-center">
+                    <h3 class="mb-4">Delete Shelf</h3>
+                  </div>
+                  <form [formGroup]="deleteShelfForm" (ngSubmit)="onDeleteShelfSubmit()">
+                    @if (deleteShelfMessage) {
+                      <div [class]="deleteShelfMessageClass">
+                        <i class="fas fa-exclamation-circle"></i> {{ deleteShelfMessage }}
+                      </div>
+                    }
+                    <div class="mb-3">
+                      <label for="deleteShelfStorageId" class="form-label">Storage</label>
+                      <select class="form-control custom-input"
+                              [class.invalid]="deleteShelfForm.get('storageId')?.invalid && deleteShelfForm.get('storageId')?.touched"
+                              id="deleteShelfStorageId" formControlName="storageId" (change)="onStorageChange($event)">
+                        <option value="" disabled>Select a storage</option>
+                        @for (storage of storages; track storage.id) {
+                          <option [value]="storage.id">{{ storage.storageName }}</option>
+                        }
+                      </select>
+                      <span class="error-text" *ngIf="deleteShelfForm.get('storageId')?.invalid && deleteShelfForm.get('storageId')?.touched">
+                        {{ getErrorMessage(deleteShelfForm.get('storageId'), 'Storage') }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label for="deleteShelfId" class="form-label">Shelf</label>
+                      <select class="form-control custom-input"
+                              [class.invalid]="deleteShelfForm.get('shelfId')?.invalid && deleteShelfForm.get('shelfId')?.touched"
+                              id="deleteShelfId" formControlName="shelfId">
+                        <option value="" disabled>Select a shelf</option>
+                        @for (shelf of shelves; track shelf.id) {
+                          <option [value]="shelf.id">{{ shelf.shelfName }} - {{ shelf.shelfLocation }}</option>
+                        }
+                      </select>
+                      <span class="error-text" *ngIf="deleteShelfForm.get('shelfId')?.invalid && deleteShelfForm.get('shelfId')?.touched">
+                        {{ getErrorMessage(deleteShelfForm.get('shelfId'), 'Shelf') }}
+                      </span>
+                    </div>
+                    <div class="shelf-list">
+                      <h5>Shelves in Selected Storage:</h5>
+                      <ul class="list-group">
+                        @for (shelf of shelves; track shelf.id) {
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ shelf.shelfName }} - {{ shelf.shelfLocation }}</span>
+                            <span class="badge" [ngClass]="{'bg-success': shelf.shelfIsFull, 'bg-secondary': !shelf.shelfIsFull}">
+                              {{ shelf.shelfIsFull ? 'Full' : 'Not Full' }}
+                            </span>
+                          </li>
+                        }
+                        @if (shelves.length === 0) {
+                          <li class="list-group-item text-muted">No shelves found in this storage.</li>
+                        }
+                      </ul>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 mt-3" [disabled]="deleteShelfForm.invalid">Delete Shelf</button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Delete Storage Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'deleteStorage'" id="deleteStorage">
+                <div class="register-section">
+                  <div class="text-center">
+                    <h3 class="mb-4">Delete Storage</h3>
+                  </div>
+                  <form [formGroup]="deleteStorageForm" (ngSubmit)="onDeleteStorageSubmit()">
+                    @if (deleteStorageMessage) {
+                      <div [class]="deleteStorageMessageClass">
+                        <i class="fas fa-exclamation-circle"></i> {{ deleteStorageMessage }}
+                      </div>
+                    }
+                    <div class="mb-3">
+                      <label for="deleteStorageStorageId" class="form-label">Storage</label>
+                      <select class="form-control custom-input"
+                              [class.invalid]="deleteStorageForm.get('storageId')?.invalid && deleteStorageForm.get('storageId')?.touched"
+                              id="deleteStorageStorageId" formControlName="storageId">
+                        <option value="" disabled>Select a storage</option>
+                        @for (storage of storages; track storage.id) {
+                          <option [value]="storage.id">{{ storage.storageName }} ({{ storage.location }})</option>
+                        }
+                      </select>
+                      <span class="error-text" *ngIf="deleteStorageForm.get('storageId')?.invalid && deleteStorageForm.get('storageId')?.touched">
+                        {{ getErrorMessage(deleteStorageForm.get('storageId'), 'Storage') }}
+                      </span>
+                    </div>
+                    <div class="storage-list">
+                      <h5>Available Storages:</h5>
+                      <ul class="list-group">
+                        @for (storage of storages; track storage.id) {
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ storage.storageName }} ({{ storage.location }})</span>
+                            <span class="badge" [ngClass]="{'bg-success': storage.hasShelves, 'bg-secondary': !storage.hasShelves}">
+                              {{ storage.hasShelves ? 'Has Shelves' : 'No Shelves' }}
+                            </span>
+                          </li>
+                        }
+                        @if (storages.length === 0) {
+                          <li class="list-group-item text-muted">No storages available.</li>
+                        }
+                      </ul>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 mt-3" [disabled]="deleteStorageForm.invalid">Delete Storage</button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Delete User Tab -->
+              <div class="tab-pane" [class.active]="activeTab === 'deleteUser'" id="deleteUser">
+                <div class="register-section">
+                  <div class="text-center">
+                    <h3 class="mb-4">Delete User</h3>
+                  </div>
+                  @if (deleteUserMessage) {
+                    <div [class]="deleteUserMessageClass">
+                      <i class="fas fa-exclamation-circle"></i> {{ deleteUserMessage }}
+                    </div>
+                  }
+                  <div class="d-flex gap-2 mb-3">
+                    <div class="search-bar roboto-condensed">
+                      <i class="fas fa-search"></i>
+                      <input type="text" placeholder="Search users..." [(ngModel)]="searchTerm" (input)="filterUsers()">
+                    </div>
+                    <button class="btn btn-custom abc-button" (click)="sortUsers()">
+                      <span><i class="fas" [ngClass]="{'fa-sort-alpha-down': isAscending, 'fa-sort-alpha-up': !isAscending}"></i></span>
+                      <span class="abc-text">ABC</span>
+                    </button>
+                  </div>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (user of filteredUsers; track user.id) {
+                        <tr>
+                          <td>{{ user.userName }}</td>
+                          <td>{{ user.firstName }} {{ user.lastName }}</td>
+                          <td>{{ user.email }}</td>
+                          <td>
+                            <button class="btn btn-danger" (click)="confirmDelete(user.id)">Delete</button>
+                          </td>
+                        </tr>
+                      }
+                      @if (filteredUsers.length === 0) {
+                        <tr>
+                          <td colspan="4" class="text-center text-muted">No users found.</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="tab-pane" [class.active]="activeTab === 'movementRequests'" id="movementRequests">
+                <div class="register-section">
+                  <div class="text-center">
+                    <h3 class="mb-4">Create Movement Request</h3>
+                  </div>
+                  <form [formGroup]="movementRequestForm" (ngSubmit)="onMovementRequestSubmit()">
+                    @if (movementRequestMessage) {
+                      <div class="alert" [ngClass]="movementRequestMessageClass">
+                        <i class="fas fa-exclamation-circle"></i> {{ movementRequestMessage }}
+                      </div>
+                    }
+                    <input type="hidden" formControlName="adminId">
+                    <div class="mb-3">
+                      <label for="requestType" class="form-label">Request Type</label>
+                      <select class="form-control custom-input" id="requestType" formControlName="requestType"
+                              [class.invalid]="movementRequestForm.get('requestType')?.invalid && movementRequestForm.get('requestType')?.touched">
+                        <option value="add">Add Pallet</option>
+                        <option value="remove">Remove Pallet</option>
+                        <option value="move">Move Pallet</option>
+                      </select>
+                      <span class="error-text" *ngIf="movementRequestForm.get('requestType')?.invalid && movementRequestForm.get('requestType')?.touched">
+                        {{ getErrorMessage(movementRequestForm.get('requestType'), 'Request Type') }}
+                      </span>
+                    </div>
+                    <!-- Pallet dropdown for "add" (unchanged) -->
+                    @if (movementRequestForm.get('requestType')?.value === 'add') {
+                      <div class="mb-3">
+                        <label for="palletSelect" class="form-label">Pallet</label>
+                        <div class="dropdown">
+                          <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
+                                  id="palletSelect" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-pallet me-2"></i>
+                            {{ selectedPallet ? selectedPallet.palletName : 'Select a pallet' }}
+                          </button>
+                          <div class="dropdown-menu w-100" aria-labelledby="palletSelect">
+                            <div class="px-2 mb-2">
+                              <input type="text" class="form-control" placeholder="Search pallets..."
+                                     [(ngModel)]="palletSearchTerm" (input)="filterPallets()" [ngModelOptions]="{standalone: true}">
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            @if (filteredPallets.length > 0) {
+                              @for (pallet of filteredPallets; track pallet.palletId) {
+                                <a class="dropdown-item" href="javascript:void(0)" (click)="selectPallet(pallet)">
+                                  {{ pallet.palletName }}
+                                </a>
+                              }
+                            } @else {
+                              <div class="dropdown-item text-muted">No pallets found</div>
+                            }
+                          </div>
+                        </div>
+                        <span class="error-text" *ngIf="movementRequestForm.get('palletId')?.invalid && movementRequestForm.get('palletId')?.touched">
+                          {{ getErrorMessage(movementRequestForm.get('palletId'), 'Pallet') }}
+                        </span>
+                      </div>
+                    }
+                    <!-- Source Storage and Shelf for "remove" and "move" -->
+                    @if (movementRequestForm.get('requestType')?.value === 'remove' || movementRequestForm.get('requestType')?.value === 'move') {
+                      <div class="mb-3">
+                        <label for="fromStorageId" class="form-label">Source Storage</label>
+                        <div class="input-group">
+                          <span class="input-group-text">
+                            <i class="fas fa-warehouse"></i>
+                          </span>
+                          <select class="form-control custom-input" id="fromStorageId" formControlName="fromStorageId"
+                                  [class.invalid]="movementRequestForm.get('fromStorageId')?.invalid && movementRequestForm.get('fromStorageId')?.touched"
+                                  (change)="onFromStorageChange($event)">
+                            <option value="" disabled>Select a storage</option>
+                            @for (storage of storages; track storage.id) {
+                              <option [value]="storage.id">{{ storage.storageName }}</option>
+                            }
+                          </select>
+                        </div>
+                        <span class="error-text" *ngIf="movementRequestForm.get('fromStorageId')?.invalid && movementRequestForm.get('fromStorageId')?.touched">
+                          {{ getErrorMessage(movementRequestForm.get('fromStorageId'), 'Source Storage') }}
+                        </span>
+                      </div>
+                      <div class="mb-3">
+                        <label for="fromShelfId" class="form-label">Source Shelf</label>
+                        <div class="input-group">
+                          <span class="input-group-text">
+                            <i class="fas fa-warehouse"></i>
+                          </span>
+                          <select class="form-control custom-input" id="fromShelfId" formControlName="fromShelfId"
+                                  [class.invalid]="movementRequestForm.get('fromShelfId')?.invalid && movementRequestForm.get('fromShelfId')?.touched"
+                                  (change)="onFromShelfChange($event)">
+                            <option value="" disabled>Select a shelf</option>
+                            @for (shelf of filteredShelvesForFrom; track shelf.id) {
+                              <option [value]="shelf.id">{{ shelf.shelfName }} - {{ shelf.shelfLocation }}</option>
+                            }
+                          </select>
+                        </div>
+                        <span class="error-text" *ngIf="movementRequestForm.get('fromShelfId')?.invalid && movementRequestForm.get('fromShelfId')?.touched">
+                          {{ getErrorMessage(movementRequestForm.get('fromShelfId'), 'Source Shelf') }}
+                        </span>
+                      </div>
+                      <!-- Pallet search dropdown for "remove" and "move" -->
+                      @if (movementRequestForm.get('fromShelfId')?.value) {
+                        <div class="mb-3">
+                          <label for="palletSelectRemoveMove" class="form-label">Pallet</label>
+                          <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
+                                    id="palletSelectRemoveMove" data-bs-toggle="dropdown" aria-expanded="false">
+                              <i class="fas fa-pallet me-2"></i>
+                              {{ selectedPallet ? selectedPallet.palletName : 'Select a pallet' }}
+                            </button>
+                            <div class="dropdown-menu w-100" aria-labelledby="palletSelectRemoveMove">
+                              <div class="px-2 mb-2">
+                                <input type="text" class="form-control" placeholder="Search pallets..."
+                                       [(ngModel)]="palletSearchTerm" (input)="filterPallets()" [ngModelOptions]="{standalone: true}">
+                              </div>
+                              <div class="dropdown-divider"></div>
+                              @if (filteredPallets.length > 0) {
+                                @for (pallet of filteredPallets; track pallet.palletId) {
+                                  <a class="dropdown-item" href="javascript:void(0)" (click)="selectPallet(pallet)">
+                                    {{ pallet.palletName }}
+                                  </a>
+                                }
+                              } @else {
+                                <div class="dropdown-item text-muted">No pallets found on this shelf</div>
+                              }
+                            </div>
+                          </div>
+                          <span class="error-text" *ngIf="movementRequestForm.get('palletId')?.invalid && movementRequestForm.get('palletId')?.touched">
+                            {{ getErrorMessage(movementRequestForm.get('palletId'), 'Pallet') }}
+                          </span>
+                        </div>
+                      }
+                    }
+                    <!-- Target Storage and Shelf for "add" and "move" -->
+                    @if (movementRequestForm.get('requestType')?.value === 'add' || movementRequestForm.get('requestType')?.value === 'move') {
+                      <div class="mb-3">
+                        <label for="toStorageId" class="form-label">Target Storage</label>
+                        <div class="input-group">
+                          <span class="input-group-text">
+                            <i class="fas fa-warehouse"></i>
+                          </span>
+                          <select class="form-control custom-input" id="toStorageId" formControlName="toStorageId"
+                                  [class.invalid]="movementRequestForm.get('toStorageId')?.invalid && movementRequestForm.get('toStorageId')?.touched"
+                                  (change)="onToStorageChange($event)">
+                            <option value="" disabled>Select a storage</option>
+                            @for (storage of storages; track storage.id) {
+                              <option [value]="storage.id">{{ storage.storageName }}</option>
+                            }
+                          </select>
+                        </div>
+                        <span class="error-text" *ngIf="movementRequestForm.get('toStorageId')?.invalid && movementRequestForm.get('toStorageId')?.touched">
+                          {{ getErrorMessage(movementRequestForm.get('toStorageId'), 'Target Storage') }}
+                        </span>
+                      </div>
+                      <div class="mb-3">
+                        <label for="toShelfId" class="form-label">Target Shelf</label>
+                        <div class="input-group">
+                          <span class="input-group-text">
+                            <i class="fas fa-warehouse"></i>
+                          </span>
+                          <select class="form-control custom-input" id="toShelfId" formControlName="toShelfId"
+                                  [class.invalid]="movementRequestForm.get('toShelfId')?.invalid && movementRequestForm.get('toShelfId')?.touched">
+                            <option value="" disabled>Select a shelf</option>
+                            @for (shelf of filteredShelvesForTo; track shelf.id) {
+                              <option [value]="shelf.id">{{ shelf.shelfName }} - {{ shelf.shelfLocation }}</option>
+                            }
+                          </select>
+                        </div>
+                        <span class="error-text" *ngIf="movementRequestForm.get('toShelfId')?.invalid && movementRequestForm.get('toShelfId')?.touched">
+                          {{ getErrorMessage(movementRequestForm.get('toShelfId'), 'Target Shelf') }}
+                        </span>
+                      </div>
+                    }
+                    <div class="mb-3">
+                      <label for="timeLimit" class="form-label">Time Limit</label>
+                      <div class="input-group">
+                        <span class="input-group-text">
+                          <i class="fas fa-clock"></i>
+                        </span>
+                        <input type="datetime-local" class="form-control custom-input" id="timeLimit" formControlName="timeLimit"
+                               [class.invalid]="movementRequestForm.get('timeLimit')?.invalid && movementRequestForm.get('timeLimit')?.touched"
+                               [min]="minDateTime" step="1">
+                      </div>
+                      <span class="error-text" *ngIf="movementRequestForm.get('timeLimit')?.invalid && movementRequestForm.get('timeLimit')?.touched">
+                        {{ getErrorMessage(movementRequestForm.get('timeLimit'), 'Time Limit') }}
+                      </span>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100" [disabled]="movementRequestForm.invalid || isMovementRequestLoading">
+                      {{ isMovementRequestLoading ? 'Submitting...' : 'Create Request' }}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

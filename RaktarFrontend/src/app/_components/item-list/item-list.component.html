@@ -1,0 +1,120 @@
+<!-- Navigációs komponens (Navigation Component) -->
+<app-navbar></app-navbar>
+
+<!-- Fő tartalom (Main Content) -->
+<div class="main-content roboto-condensed">
+  <!-- Admin és profil komponensek (Admin and Profile Components) -->
+  <app-admin-panel></app-admin-panel>
+  <app-profile></app-profile>
+
+<!-- Konténer (Container) -->
+  <div class="container-fluid p-4" style="background-color: #F1FAEE;">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-8">
+
+<!-- Szűrő és rendezési sáv (Filter and Sort Bar) -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center gap-2">
+
+<!-- Kategória legördülő menü (Category Dropdown) -->
+            <div class="dropdown">
+              <button class="btn dropdown-toggle open-button" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Open
+              </button>
+              <div class="dropdown-menu p-3" aria-labelledby="filterDropdown" style="border-radius: 10px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); width: 200px;">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="metal" (change)="toggleCategory('Metal')">
+                  <label class="form-check-label" for="metal">Metal</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="wood" (change)="toggleCategory('Wood')">
+                  <label class="form-check-label" for="wood">Wood</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="plastic" (change)="toggleCategory('Plastic')">
+                  <label class="form-check-label" for="plastic">Plastic</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="titanium" (change)="toggleCategory('Titanium')">
+                  <label class="form-check-label" for="titanium">Titanium</label>
+                </div>
+              </div>
+            </div>
+<!-- Súly szerinti rendezés gomb (Sort by Weight Button) -->
+            <button class="btn weight-button" (click)="sortByWeight()">
+              <i class="fa-solid fa-weight-hanging"></i><span class="weight-text">Weight</span>
+              <i class="fas fa-arrow-down arrow-icon" [ngClass]="{'rotate-up': isWeightAscending}"></i>
+            </button>
+<!-- Név szerinti rendezés gomb (Sort by Name Button) -->
+            <button class="btn abc-button" (click)="sortByName()">
+              <span class="abc-icon"><i class="fas" [ngClass]="{'fa-sort-alpha-down': !isNameAscending, 'fa-sort-alpha-up': isNameAscending}"></i></span>
+              <span class="abc-text">ABC</span>
+            </button>
+          </div>
+<!-- Keresőmező (Search Field) -->
+          <div class="d-flex gap-2">
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+              <input type="text" class="form-control search-input" placeholder="Search by name..." [(ngModel)]="searchTerm" (input)="searchItems()">
+            </div>
+          </div>
+        </div>
+
+<!-- Cím (Title) -->
+        <h2 class="text-center mb-4">Item List</h2>
+
+<!-- Tétellista (Item List) -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-2 row-cols-xxl-3 g-4">
+          <div class="col" *ngFor="let item of items">
+            <div class="card shadow-sm h-100 larger-card">
+              <div class="card-body d-flex flex-column p-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="item-square bg-opacity-25 me-3">
+                    <img src="assets/placeholder.png" class="img-fluid" alt="Item Placeholder" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+                  <div>
+                    <h5 class="card-title mb-1">{{ item.name }}</h5>
+                    <p class="card-text mb-1">
+                      <strong>Weight:</strong> {{ item.weight }} kg<br>
+                      <strong>Category:</strong> {{ item.material }}
+                    </p>
+                  </div>
+                </div>
+                <button class="btn details-button" (click)="openModal(item)">Details</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- Modál ablak (Modal Window) -->
+    <div #itemModal class="modal fade" id="itemModal" tabindex="-1" aria-labelledby="itemModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="itemModalLabel">Item Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row"> 
+              <div class="col-md-8">
+                <h4>{{ selectedItem?.name || 'No name available' }}</h4>
+                <p><strong>SKU:</strong> {{ selectedItem?.sku || 'No SKU available' }}</p>
+                <p><strong>Material:</strong> {{ selectedItem?.material || 'No material available' }}</p>
+                <p><strong>Quantity:</strong> {{ selectedItem?.quantity || 0 }}</p>
+                <p><strong>Price:</strong> ${{ selectedItem?.price || 0 }}</p>
+                <p><strong>Weight:</strong> {{ selectedItem?.weight || 0 }} kg</p>
+                <p><strong>Dimensions:</strong> {{ selectedItem?.dimensions || 0 }} cm</p>
+                <p><strong>Description:</strong> {{ selectedItem?.description || 'No description available' }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn close-button" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

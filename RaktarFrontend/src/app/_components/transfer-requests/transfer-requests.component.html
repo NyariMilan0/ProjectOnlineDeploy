@@ -1,0 +1,64 @@
+<app-admin-panel></app-admin-panel>
+<app-profile></app-profile>
+<div class="page-container">
+  <app-navbar class="sidebar"></app-navbar>
+  <div class="content-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="roboto-condensed">Transfer Requests <i class="fas fa-truck"></i></h1>
+      <div class="d-flex gap-2">
+        <div class="search-bar roboto-condensed">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search..." (keyup)="search($event)" />
+        </div>
+        <button class="btn btn-custom" (click)="sortTable()">Sort by: <span>{{ sortDirectionLabel }}</span></button>
+      </div>
+    </div>
+    <div class="table-container">
+      <!-- Loading Indicator -->
+      <div *ngIf="isLoading" class="text-center my-4">
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <p>Loading transfer requests...</p>
+      </div>
+      <!-- Error Message -->
+      <div *ngIf="errorMessage && !isLoading" class="alert alert-danger roboto-condensed">
+        {{ errorMessage }}
+        <button class="btn btn-link" (click)="fetchTransferRequests()">Retry</button>
+      </div>
+      <!-- Table -->
+      <table *ngIf="!isLoading && !errorMessage" class="table table-hover shadow-sm roboto-condensed">
+        <thead>
+          <tr>
+            <th>Pallets</th>
+            <th>Location</th>
+            <th>Target Location</th>
+            <th>Action Type</th>
+            <th>Time Limit</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredData">
+            <td>{{ item.pallet || 'N/A' }}</td>
+            <td>{{ item.location || 'N/A' }}</td>
+            <td>{{ item.targetLocation || 'N/A' }}</td>
+            <td>{{ item.actionType || 'N/A' }}</td>
+            <td>{{ (item.timeLimit | date:'medium') || 'N/A' }}</td>
+            <td>
+              <span [class]="item.status === 'Completed' ? 'status-completed' : item.status === 'Failed' ? 'status-failed' : 'status-pending'">
+                {{ item.status || 'Unknown' }}
+              </span>
+            </td>
+            <td>
+              <button *ngIf="item.status === 'Pending'" class="btn btn-complete" (click)="confirmComplete(item)">Complete</button>
+            </td>
+          </tr>
+          <!-- Empty State -->
+          <tr *ngIf="filteredData.length === 0 && !isLoading && !errorMessage">
+            <td colspan="7" class="text-center">No transfer requests found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

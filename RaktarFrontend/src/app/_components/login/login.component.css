@@ -1,0 +1,205 @@
+/* Betűtípus és alapbeállítások */
+#container {
+    background-image: url('/assets/login.jpg');
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* Konténer és sorok (Layout alapok) */
+.row {
+    height: 100vh;
+}
+
+/* Bal és jobb panelek */
+.Loginpanel {
+    width: fit-content;
+    text-align: center;
+}
+
+.content {
+    width: 60%;
+}
+
+.col-5 {
+    padding-top: 300px;
+    padding-right: 100px;
+}
+
+.col-7 {
+    padding-top: 100px;
+    padding-left: 200px;
+}
+
+/* Címsorok */
+.title {
+    margin-right: 10px;
+    font-size: 40px;
+    color: #1D3557;
+    height: 63px;
+    width: 221px;
+    display: inline-block;
+    margin-bottom: 0px;
+}
+
+sub {
+    width: 302px;
+    height: 29px;
+    color: #1D3557;
+    font-size: large;
+}
+
+#text {
+    color: #1D3557;
+}
+
+/* Részletek gomb és felugró ablak (Gombok és interaktív elemek) */
+.signIn {
+    border-radius: 8px;
+    width: 178px;
+    height: 40px;
+    background-color: #457B9D;
+    color: white;
+    text-align: center;
+    border: none;
+    transition: 1s;
+}
+
+.signIn:hover {
+    background-color: #1D3557;
+    color: white;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    height: 52px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-password i {
+    font-size: 18px;
+    color: #1D3557;
+}
+
+/* Keresősáv (Űrlap elemek) */
+.login-input {
+    padding-left: 10px;
+    align-items: center;
+    width: 372px;
+    height: 52px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 1px 2px 3px #888888;
+}
+
+.password-container {
+    position: relative;
+    width: 372px;
+}
+
+.password-input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.login-input.invalid {
+    border: 1px solid red;
+}
+
+.login-input.ng-valid {
+    border: 1px solid green;
+}
+
+/* Polc részletei (Szövegek és dekoráció) */
+.icon-container img {
+    margin-bottom: 15px;
+}
+
+.login-text {
+    font-size: 25px;
+    color: #1D3557;
+}
+
+.amico {
+    height: 70%;
+    width: 70%;
+}
+
+/* Alacsony készlet karuszell (Üzenetek és visszajelzések) */
+.success { 
+    color: green;
+    width: auto;
+    border-radius: 5px;
+    border: 1px solid green;
+    background-color: white;
+    border-left: 5px solid green;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.success i {
+    margin-right: 8px;
+}
+
+.error {
+    color: red;
+    padding: 0px;
+    width: auto;
+    border-radius: 5px;
+    border: 1px solid red;
+    background-color: white;
+    border-left: 5px solid red;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error i {
+    margin-right: 8px;
+}
+
+.errorText {
+    color: red;
+}
+
+/* Elválasztó (Nem használt, de helyfenntartás) */
+.loginContainer {
+    user-select: none;
+    justify-items: center;
+}
+
+/* Reszponzív média lekérdezések */
+@media (max-width: 1050px) {
+    .amico {
+        display: none;
+    }
+}
+
+@media (max-width: 960px) {
+    .loginContainer, .textcontainer {
+        width: 100%;
+        height: auto;
+        padding: 0px;
+    }
+}
+
+@media (max-width: 960px) {
+    .textcontainer {
+        margin-top: 50px;
+        justify-items: center;
+    }
+}
+

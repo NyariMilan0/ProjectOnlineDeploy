@@ -1,0 +1,72 @@
+<!-- Külső konténer (Container) -->
+<div id="container" class="roboto-condensed">
+  <div class="row">
+
+<!-- Bal oldali oszlop (Bemutató szöveg és kép) -->
+    <div class="col-7 textcontainer">
+      <div class="content">
+        <span style="margin-right: 10px;" class="icon-container"><img src="/assets/CompanyLogo.svg" alt="Login Icon"
+            width="56" height="56" /></span>
+        <h1 id="text" class="title">WareTech</h1>
+        <span id="text"><sub>STORAGE MANAGEMENT</sub></span>
+        <br><br>
+        <p class="login-text">Smart storage, seamless logistics – delivering trust and efficiency every step of the way!
+        </p>
+        
+        <div>
+          <img class="amico" src="/assets/amico.jpg" alt="work">
+        </div>
+      </div>
+    </div>
+
+<!-- Jobb oldali oszlop (Bejelentkezési űrlap) -->
+    <div class="col-5 loginContainer">
+      <div class="Loginpanel">
+
+<!-- Ikon és cím -->
+        <div class="icon-container">
+          <img class="login-icon" src="/assets/CompanyLogo.svg" alt="Login Icon" width="77" height="77" />
+          <br><br>
+          <h3 id="text">Sign In</h3>
+        </div>
+<!-- Üzenet megjelenítése -->
+        <br>
+        <div [class]="messageClass" *ngIf="message">
+          <i class="fas fa-exclamation-circle"></i>{{ message }}
+        </div>
+        <br>
+
+<!-- Bejelentkezési űrlap -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <input [class.invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+            class="login-input" type="text" formControlName="username" placeholder="Username" required>
+          <br>
+          @if(loginForm.get('username')?.invalid && loginForm.get('username')?.touched){
+          <span class="errorText">Username is required</span>
+          }
+          <br>
+          <div class="password-container">
+            <input [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              class="login-input password-input" [type]="showPassword ? 'text' : 'password'" formControlName="password"
+              placeholder="Password" required>
+            <button type="button" class="toggle-password" (click)="togglePassword()">
+              <i [class]="showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+            </button>
+          </div>
+          @if(loginForm.get('password')?.invalid && loginForm.get('password')?.touched){
+          <span class="errorText">Password is required</span>
+          }
+          <br>
+          <div style="text-align: left; margin-top: 5px;">
+            <label style="color: #1D3557;">
+              <input type="checkbox" formControlName="rememberMe"> Remember Me
+            </label>
+          </div>
+          <br>
+          <button class="signIn" type="submit" [disabled]="isLoading">Sign In</button>
+          <br>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

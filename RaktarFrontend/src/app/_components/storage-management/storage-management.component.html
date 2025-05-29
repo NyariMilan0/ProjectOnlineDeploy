@@ -1,0 +1,116 @@
+
+<!-- Componentek importálása -->
+<app-navbar></app-navbar>
+<app-profile></app-profile>
+<app-admin-panel></app-admin-panel>
+
+<!-- Külső szerkezet (Container és Row) -->
+<div class="container-fluid">
+  <div class="row flex-fill h-100">
+    <div class="col-12">
+      <div class="row flex-fill h-100 roboto-condensed">
+
+<!-- Bal oldali panel -->
+        <div class="col-md-8 col-12 left-panel">
+          <h2 class="text-center">Warehouse Management</h2>
+
+<!-- Keresősáv -->
+          <div class="search-bar">
+            <input type="text" placeholder="Search Shelves" #searchInput />
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          </div>
+
+<!-- Tárolók és polcok fülei -->
+          <div class="tabs storage-tabs">
+            <button *ngFor="let storage of storages" 
+                    [class.active]="storage === selectedStorage" 
+                    (click)="selectStorage(storage)">
+              {{ storage.name }}
+            </button>
+          </div>
+          <div class="tabs shelf-tabs">
+            <button *ngFor="let shelf of filteredShelves" 
+                    [class.active]="shelf === selectedShelf" 
+                    (click)="selectShelf(shelf)">
+              {{ shelf.name }}
+            </button>
+          </div>
+
+<!-- Polc részletei -->
+          <div class="warehouse-management">
+            <div class="section">
+              <div class="section-header">
+                <span class="section-name" style="font-size: large;">{{ selectedShelf?.name }}</span>
+                <button class="details-btn" (click)="togglePopup()" *ngIf="selectedShelf">Details</button>
+                <div class="usage-info">
+                  <span class="free-place">{{ selectedShelf?.free }} Free place</span>
+                  <span class="used-place">{{ selectedShelf?.used }} Used place</span>
+                  <div class="progress-bar" [class.critical]="selectedShelf?.critical">
+                    <div class="progress" [style.width.%]="selectedShelf?.usage"></div>
+                  </div>
+                  <span>{{ selectedShelf?.usage }}% Usage | {{ 100 - selectedShelf?.usage }}%</span>
+                </div>
+              </div>
+
+<!-- Rács (Grid) -->
+              <div class="grid-container flex-fill">
+                <div class="grid-row" *ngFor="let gridPair of [0]">
+                  <div class="grid" *ngFor="let grid of getSectionSpaces().slice(gridPair * 2, (gridPair + 1) * 2)">
+                    <div class="square" *ngFor="let space of grid" 
+                         [class.used]="space.used" 
+                         [class.free]="!space.used"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+<!-- Felugró ablak (Popup) -->
+          <div class="popup" *ngIf="showPopup && selectedShelf">
+            <div class="popup-content">
+              <h4>Pallets on {{ selectedShelf.name }}</h4>
+              <ul>
+                <li *ngFor="let pallet of getPalletsForSelectedShelf()">
+                  {{ pallet.palletName }} (ID: {{ pallet.palletId }})
+                </li>
+                <li *ngIf="getPalletsForSelectedShelf().length === 0">No pallets on this shelf</li>
+              </ul>
+              <button class="close-btn" (click)="togglePopup()">Close</button>
+            </div>
+          </div>
+        </div>
+
+<!-- Jobb oldali panel -->
+        <div class="col-md-4 col-12 right-panel text-center">
+
+<!-- Raktár kapacitása -->
+          <div class="storage-capacity">
+            <h2>Warehouse Storage Capacity</h2>
+            <div class="circular-progress"
+                 [ngStyle]="{'background': 'conic-gradient(#2c3e50 ' + storageCapacity + '%, #e6f3f0 0)'}" >
+              <span>{{ storageCapacity }}%</span>
+            </div>
+          </div>
+
+<!-- Elválasztó -->
+          <hr class="separator" />
+
+<!-- Alacsony készletű termékek (Carousel) -->
+          <div class="low-stock-carousel">
+            <div class="carousel-container" #carouselContainer>
+              <div class="carousel-items" #carouselItems>
+                <div class="item" *ngFor="let item of lowStockItems">
+                  <i class="fa-solid fa-box item-icon"></i>
+                  <span>{{ item.category }}</span>
+                  <span>{{ item.name }}</span>
+                  <span class="low-stock">Low in stock</span>
+                  <span class="stock-level">{{ item.stock }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
