@@ -1,17 +1,24 @@
-# Base image
+# Stage 1: Build the Angular app
 FROM node:20-alpine AS build
 
-# Set working directory
 WORKDIR /app
 
-# Install http-server
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build --prod
+
+# Stage 2: Serve with http-server
+FROM node:20-alpine
+
+WORKDIR /app
+
 RUN npm install -g http-server
 
-# Copy built Angular files into the image
-COPY dist/raktarproject/browser /app
+# Copy built files from the previous stage
+COPY --from=build /app/dist/raktarproject/browser .
 
-# Expose the port http-server will run on
 EXPOSE 8080
 
-# Serve the app using http-server
 CMD ["http-server", ".", "-p", "8080"]
