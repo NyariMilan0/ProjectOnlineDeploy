@@ -16,11 +16,14 @@ You start with nothing but manual clicks (+1 ember each). The workshop reveals n
 | Stone hearth | 1,000 | You own the sprite | +15% all automatic production per rank (max 25). Prices ×1.8. |
 | Ember kiln | 600 | You own the sprite | First build adds 10/sec; each later level adds 10% more than the last (10, 11, 12.1…). Prices ×1.9. |
 | Charcoal bed | 7,500 | You own a kiln | +25% kiln production per rank (max 25). Prices ×1.85. |
+| Coal brazier | 4,000 | You own a kiln | Produces 35 embers/sec at first; each level adds 10% more than the last. Prices ×1.9. |
+| Smithy forge | 25,000 | You own a brazier | Produces 180/sec at first; each level adds 10% more than the last. Prices ×1.95. |
+| Ember beacon | 80,000 | You own a forge | Produces 700/sec at first; each level adds 10% more than the last. Prices ×2. |
 | Chimney draft | 20,000 | You own charcoal | +10% all ember production per rank (max 25). Prices ×1.95. |
 
 Buying a Chimney draft reveals the Blue flame workshop tab. Automatic production never depends on click strength.
 
-**Pacing.** Producer gains grow with each level but more slowly than prices, so every level takes a little longer to pay for itself. (Earlier versions added price/120 and price/60 per level, which paid back in 1–2 minutes forever and let income overflow within an hour.) In simulation, a casual player (clicking 10 minutes per hour) reaches Blue spark in about 1¼ hours and the first rebirth in about 2¼; later rebirths take around 3 hours each. A test guards against runaway income.
+**Pacing.** Producer gains grow with each level but more slowly than prices, so every level takes a little longer to pay for itself. (Earlier versions added price/120 and price/60 per level, which paid back in 1–2 minutes forever and let income overflow within an hour.) In simulation, a casual player (clicking 10 minutes per hour) reaches Blue spark in about 50 minutes and the first rebirth in about 1⅔ hours; later rebirths take roughly an hour. Income levels off instead of running away, and a test checks that.
 
 ## The Ash Grove (stage 3)
 
@@ -61,11 +64,14 @@ Switch the workshop to **Blue flame**:
 | Blue spark | 100,000 embers | Unlocks a 1% chance per manual click to find one blue flame. |
 | Cobalt lens | 3 blue flames | Adds 0.5 percentage points to drop chance, up to 25% total. Prices grow by 1.65. |
 | Azure resonance | 5 blue flames | Multiplies each drop's blue-flame amount by 1.25. Prices grow by 1.7. |
-| Blue siphon | 25,000 embers | Adds one automatic blue-flame roll/sec. Prices grow by 2.3. |
+| Blue siphon | 100,000 embers | Adds one automatic blue-flame roll/sec. Prices grow by 3.2. |
 | Azure embers | 10 blue flames | +25% all ember production per rank (max 25). Revealed after your first lens or resonance. Prices ×1.75. |
 | Twin flicker | 25 blue flames | +5% chance per rank that a drop is doubled (max 10 ranks; 75% cap with skills). Revealed after resonance. Prices ×1.9. |
 | Blue wisp | 40 blue flames | +50% siphon roll speed per rank (max 20). Revealed after your first siphon. Prices ×1.85. |
-| Spark scatter | 250,000 embers | +1 extra blue roll per manual click per rank (max 10). Revealed at Cobalt lens 3. Prices ×2.2. |
+| Spark scatter | 250,000 embers | +1 extra blue roll per manual click per rank (max 10). Revealed at Cobalt lens 3. Prices ×2.8. |
+| Blue glow | 150,000 embers | +5% all ember production per rank for every 100 blue flames you hold (counts up to 1,000 held). Max 10. Prices ×3. |
+| Cobalt bellows | 250,000 embers | +2% click strength per rank for every blue upgrade level you own this life. Revealed after your first Cobalt lens. Max 10. Prices ×3. |
+| Azure kiln | 400,000 embers | Up to +50% automatic production per rank, reaching full strength after 1,000 blue flames found this life. Revealed after your first Blue siphon. Max 10. Prices ×3. |
 
 Fractional drop amounts are preserved. Siphons use the same chance and yield as manual drops and keep working offline. Ember generators themselves do not roll for blue flames.
 
@@ -81,11 +87,11 @@ Rebirth resets embers, blue flames, all run upgrade levels (including the four s
 
 ## Permanent skills
 
-The tree has **100 defined positions across four branches**. This version has **30 playable skills** and **70 disabled future positions**, hidden by default. Planned positions are visibly marked and cannot be purchased.
+The tree has **100 defined positions across four branches**. This version has **30 playable skills**; the other 70 positions are reserved and never shown. **Skills are discovered gradually:** a skill appears only when all of its prerequisites are learned (or once you have learned it), so the tree grows as you do. The tree shows how many skills you have discovered.
 
 | Branch | Skills |
 | --- | --- |
-| Kindling | Warm memory, Steady hands, Familiar tools, Blazing start (+1,000 starting embers/rank), Ember heart (+25% all ember production/rank), Dry pockets (start with kindling), Flicker touch (clicks earn 1% of auto/sec per rank), Hearthstones (start with hearth) |
+| Kindling | Warm memory (+15% all ember production and +100 starting embers per rank), Steady hands, Familiar tools, Blazing start (+1,000 starting embers/rank), Ember heart (+25% all ember production/rank), Dry pockets (start with kindling), Flicker touch (clicks earn 1% of auto/sec per rank), Hearthstones (start with hearth) |
 | Companions | Forest bond, Kilncraft, An old friend, Banked coals (start with kiln), Deep coals (+5 pts per charcoal rank), Wisp friend (+25% siphon speed/rank), Charcoal cache (start with charcoal) |
 | Azure | Lucky embers, Blue resonance, An azure memory, Azure insight (−5% blue-upgrade prices/rank), Twin sparks (+5% doubled drops/rank), Sapphire start (+25 starting blue/rank), Remembered lens, Quiet siphon |
 | Time | Patient fire, Careful spending, Long dreams, Gathered moments (keep 5% of held embers on rebirth/rank), Frugal fire (−2% more run prices/rank), Echo of lives (+2% ember production per rebirth/rank), Deep sleep (+2h offline/rank) |

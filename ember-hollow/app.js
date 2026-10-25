@@ -15,6 +15,8 @@
   const SETTINGS_KEY = 'ember-hollow-settings-v1';
   let preferences = { sound: false, reducedMotion: false, compact: true, music: true, musicVolume: 20, buyAmount: '1' };
   const BUY_AMOUNTS = ['1', '10', 'max'];
+  const EMBER_KINDS = ['bellows', 'kindling', 'sprite', 'hearth', 'kiln', 'charcoal', 'brazier', 'forge', 'beacon', 'draft'];
+  const PRODUCER_NAMES = { sprite: 'ember sprite', kiln: 'ember kiln', brazier: 'coal brazier', forge: 'smithy forge', beacon: 'ember beacon' };
   // Value passed to Game.bulkQuote / Game.buyBulk.
   function buyAmount() { return preferences.buyAmount === 'max' ? 'max' : Number(preferences.buyAmount); }
   // Short note fragment for multi-level quotes: " · +10 levels".
@@ -142,14 +144,14 @@
     const canBuy = quote.affordable, button = $('buy-' + type);
     Dom.disabled(button, !canBuy);
     text(type + '-cost', maxed ? 'MAX' : format(cost));
-    text(type + '-level', (type === 'sprite' || type === 'kiln') && level === 0 ? 'NOT OWNED' : 'LV. ' + format(level));
+    text(type + '-level', PRODUCER_NAMES[type] && level === 0 ? 'NOT OWNED' : 'LV. ' + format(level));
     Dom.bar($(type + '-progress'), maxed ? 1 : state.embers / cost);
     text(type + '-note', maxed ? 'Fully upgraded' : (canBuy ? 'Ready when you are' : format(Math.max(0, cost - state.embers)) + ' more embers to go') + levelsNote(quote));
     Dom.toggle($(type + '-card'), 'affordable', canBuy);
-    const names = { bellows: 'bellows', sprite: 'ember sprite', kiln: 'ember kiln', kindling: 'dry kindling', hearth: 'stone hearth', charcoal: 'charcoal', draft: 'chimney draft' };
+    const names = Object.assign({ bellows: 'bellows', kindling: 'dry kindling', hearth: 'stone hearth', charcoal: 'charcoal', draft: 'chimney draft' }, PRODUCER_NAMES);
     const label = maxed ? 'Fully upgraded' : (type === 'sprite' && level === 0 ? 'Bind ember sprite' : type === 'kiln' && level === 0 ? 'Build ember kiln' : 'Upgrade ' + names[type]) + (quote.count > 1 ? ' by ' + quote.count + ' levels' : '') + ' for ' + format(cost) + ' embers';
     Dom.attr(button, 'aria-label', label);
-    if (type === 'sprite' || type === 'kiln') {
+    if (PRODUCER_NAMES[type]) {
       text(type + '-rate', format(Game.productionRate(state, type)));
       text(type + '-gain', maxed ? 'MAX' : '+' + format(Game.upgradeGain(state, type)));
     }
@@ -166,6 +168,7 @@
     if (type === 'charcoal') text('charcoal-benefit', '+25% base kiln output per rank · +' + format(Game.upgradeGain(state, type)) + '/sec now');
     if (type === 'draft') text('draft-benefit', '+10% base ember production per rank, from clicks and automation');
     if (type === 'kiln') text('kiln-action', level === 0 ? 'BUILD KILN' : 'UPGRADE KILN');
+    if (type === 'brazier' || type === 'forge' || type === 'beacon') text(type + '-action', level === 0 ? 'BUILD' : 'UPGRADE');
   }
   function buildAchievements() {
     const grid = $('achievements-grid');
@@ -245,7 +248,7 @@
   function renderCards(announce, full) {
     text('fire-status', state.kiln > 0 ? 'One little companion. A kiln full of warmth.' : state.sprites > 0 ? 'Your little companion is tending the fire.' : 'Just you, a small fire, and the first spark.');
     // Only the open workshop tab is redrawn on routine ticks.
-    if (full || !$('workshop-panel-embers').hidden) ['bellows', 'kindling', 'sprite', 'hearth', 'kiln', 'charcoal', 'draft'].forEach(type => upgradeDisplay(type, state[type === 'sprite' ? 'sprites' : type]));
+    if (full || !$('workshop-panel-embers').hidden) EMBER_KINDS.forEach(type => upgradeDisplay(type, state[type === 'sprite' ? 'sprites' : type]));
     text('discovery-hint', state.bellows === 0 && state.sprites === 0 ? 'Upgrade your bellows to discover more.' : state.sprites === 0 ? 'Bind a companion to keep the fire growing while you rest.' : state.kiln === 0 ? 'A little company opens the way to a stronger hearth.' : state.charcoal === 0 ? 'Better fuel will carry the fire further.' : state.draft === 0 ? 'A steady draft could reveal a different kind of spark.' : !state.blueUnlocked ? 'The next stage awaits at 100K embers.' : 'A rare blue spark. A new path forward.');
     text('stage-label', state.blueUnlocked ? 'STAGE 2 · THE AZURE' : 'STAGE 1 · THE HEARTH');
     if (lastSpriteLevel !== state.sprites) { scene.setSprites(state.sprites); lastSpriteLevel = state.sprites; }
@@ -298,6 +301,10 @@
       return;
     }
     const names = { kindling: 'Dry kindling', hearth: 'Stone hearth', charcoal: 'Charcoal', draft: 'Chimney draft' };
+    const built = { brazier: 'Your coal brazier', forge: 'Your smithy forge', beacon: 'Your ember beacon' };
+    const boosted = { blueGlow: 'Blue glow', cobaltBellows: 'Cobalt bellows', azureKiln: 'Azure kiln' };
+    if (built[type]) { toast(built[type] + ' now produces ' + format(Game.productionRate(state, type)) + ' embers/sec.'); return; }
+    if (boosted[type]) { toast(boosted[type] + ' upgraded to level ' + state[type] + '.'); return; }
     toast(names[type] ? names[type] + ' upgraded. The fire grows stronger.' : type === 'bellows' ? 'Bellows upgraded. Now +' + format(Game.clickPower(state)) + ' per click.' : type === 'sprite' || type === 'kiln' ? (type === 'sprite' ? 'Your sprite' : 'Your kiln') + ' now produces ' + format(Game.productionRate(state, type)) + ' embers/sec.' : type === 'blueUnlock' ? 'Blue flames awakened. Every manual click now has a ' + format(Game.blueChance(state) * 100) + '% chance.' : type === 'blueChance' ? 'Blue-flame chance increased to ' + format(Game.blueChance(state) * 100) + '%.' : type === 'blueYield' ? 'Blue-flame drops now give ' + format(Game.blueYield(state)) + ' each.' : type === 'blueEmbers' ? 'Azure embers: +' + format(state.blueEmbers * 25) + '% ember production.' : type === 'blueDouble' ? 'Twin flicker: ' + format(Game.blueDoubleChance(state) * 100) + '% of drops are doubled.' : type === 'blueWisp' ? 'Blue wisp upgraded. ' + format(Game.blueRollRate(state)) + ' automatic rolls/sec.' : type === 'blueScatter' ? 'Spark scatter: ' + format(Game.clickRolls(state)) + ' blue rolls per click.' : 'Blue siphon upgraded. ' + format(Game.blueRollRate(state)) + ' automatic rolls/sec.');
   }
   function updateSound() {
@@ -323,7 +330,7 @@
     $(id).addEventListener('pointerdown', pointerStoke);
     $(id).addEventListener('click', clickStoke);
   });
-  ['bellows', 'kindling', 'sprite', 'hearth', 'kiln', 'charcoal', 'draft'].forEach(type => $('buy-' + type).addEventListener('click', () => buy(type)));
+  EMBER_KINDS.forEach(type => $('buy-' + type).addEventListener('click', () => buy(type)));
   $('sound-toggle').addEventListener('click', () => {
     changeSettings({ sound: !soundEnabled }); sound('buy', performance.now());
   });

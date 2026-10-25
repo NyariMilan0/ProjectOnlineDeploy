@@ -12,7 +12,7 @@
     { id: 'time', title: 'Time', description: 'Make patient progress reach a little further.' }
   ].map(Object.freeze));
   const active = [
-    { id: 'warm-memory', branch: 'kindling', title: 'Warm memory', description: 'Start future runs with 50 embers per rank.', maxLevel: 5, basePointCost: 1, baseBlueCost: 0, requires: [], icon: '✦' },
+    { id: 'warm-memory', branch: 'kindling', title: 'Warm memory', description: '+15% all ember production per rank, and start future runs with 100 embers per rank.', maxLevel: 5, basePointCost: 1, baseBlueCost: 0, requires: [], icon: '✦' },
     { id: 'steady-hands', branch: 'kindling', title: 'Steady hands', description: '+15% manual click strength per rank.', maxLevel: 5, basePointCost: 1, baseBlueCost: 10, requires: [{ id: 'warm-memory', level: 1 }], icon: '◆' },
     { id: 'bellows-memory', branch: 'kindling', title: 'Familiar tools', description: 'Start future runs with +1 bellows level per rank.', maxLevel: 5, basePointCost: 2, baseBlueCost: 25, requires: [{ id: 'steady-hands', level: 1 }], icon: '◇' },
     { id: 'forest-bond', branch: 'companions', title: 'Forest bond', description: '+15% sprite production per rank.', maxLevel: 5, basePointCost: 1, baseBlueCost: 5, requires: [{ id: 'warm-memory', level: 1 }], icon: '✧' },

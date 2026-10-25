@@ -141,7 +141,7 @@ test('rebirth resets run currency and upgrades but preserves lifetime records an
   const lifetime = state.totalEarned, clicks = state.manualClicks, played = state.playedSeconds, blueLifetime = state.lifetimeBlue;
   const pointsBefore = state.rebirthPoints;
   assert.equal(game.rebirth(state, NOW + 10000), 1);
-  assert.equal(state.embers, 50);
+  assert.equal(state.embers, 100);
   assert.equal(state.blueFlames, 0);
   assert.equal(state.bellows, 1);
   assert.equal(state.sprites, 0);
@@ -151,15 +151,15 @@ test('rebirth resets run currency and upgrades but preserves lifetime records an
   assert.equal(state.blueSiphon, 0);
   assert.equal(state.runClicks, 0);
   assert.equal(state.runSeconds, 0);
-  assert.equal(state.runEmbers, 50);
+  assert.equal(state.runEmbers, 100);
   assert.equal(state.manualClicks, clicks);
   assert.equal(state.playedSeconds, played);
-  assert.equal(state.totalEarned, lifetime + 50);
+  assert.equal(state.totalEarned, lifetime + 100);
   assert.equal(state.lifetimeBlue, blueLifetime);
   assert.equal(state.rebirthPoints, pointsBefore + 1);
   assert.equal(state.skills['warm-memory'], 1);
   assert.equal(state.skills['steady-hands'], 1);
-  near(game.clickPower(state), 2.3);
+  near(game.clickPower(state), 2.3 * 1.15); // includes Warm memory
   assert.equal(state.bestKiln, 1);
   assert.equal(state.bestSprites, 1);
 });
@@ -172,11 +172,11 @@ test('permanent skills enforce rebirth, prerequisites, both currencies, and rank
   assert.equal(game.buySkill(state, 'warm-memory'), true);
   assert.equal(game.getSkillInfo(state, 'warm-memory').pointCost, 2);
   assert.equal(game.buySkill(state, 'steady-hands'), true);
-  near(game.clickPower(state), 1.15);
+  near(game.clickPower(state), 1.15 * 1.15); // Steady hands × Warm memory
   const previousBlue = state.blueFlames;
   assert.equal(game.buySkill(state, 'steady-hands'), true);
   assert.equal(previousBlue - state.blueFlames, 16);
-  near(game.clickPower(state), 1.3, 1e-9);
+  near(game.clickPower(state), 1.3 * 1.15, 1e-9);
   for (let rank = 2; rank < 5; rank++) assert.equal(game.buySkill(state, 'steady-hands'), true);
   assert.equal(game.getSkillInfo(state, 'steady-hands').maxed, true);
   assert.equal(game.buySkill(state, 'steady-hands'), false);
@@ -192,11 +192,11 @@ test('saved permanent effects, extended offline time, and malformed skill values
   game.buySkill(state, 'warm-memory'); game.buySkill(state, 'patient-fire'); game.buySkill(state, 'patient-fire');
   game.buySkill(state, 'long-dreams'); game.buySkill(state, 'careful-spending');
   assert.equal(game.offlineLimit(state), 32400);
-  near(game.autoRate(state), .6);
+  near(game.autoRate(state), .6 * 1.15);
   assert.equal(game.getUpgradeCost(state, 'sprite'), 100);
   const loaded = game.restore(game.serialize(state, NOW), NOW + 48 * 3600000);
   assert.equal(loaded.offlineSeconds, 32400);
-  near(game.autoRate(loaded.state), .6);
+  near(game.autoRate(loaded.state), .6 * 1.15);
   assert.equal(loaded.state.skills['long-dreams'], 1);
   const malformed = game.sanitize({ ...state, skills: { 'steady-hands': 1e100, 'warm-memory': 2, 'blue-resonance': 5, 'azure-future-4': 10 }, rebirthPoints: Infinity, blueChanceLevel: -4, rngState: 0 }, NOW);
   assert.equal(malformed.skills['steady-hands'], 5);

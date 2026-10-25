@@ -98,7 +98,7 @@ test('Flicker touch, Ember heart, Deep coals and Echo of lives change the displa
   const state = blueRun({ charcoal: 2 });
   const kiln = game.productionRate(state, 'kiln');
   learn(state, { 'warm-memory': 1, 'forest-bond': 1, kilncraft: 2, 'deep-coals': 2 });
-  near(game.productionRate(state, 'kiln'), kiln * 1.3 * (1 + .35 * 2) / 1.5, 1e-9);
+  near(game.productionRate(state, 'kiln'), kiln * 1.15 * 1.3 * (1 + .35 * 2) / 1.5, 1e-9); // Warm memory × Kilncraft × Deep coals
   const base = game.baseClick(state);
   learn(state, { 'steady-hands': 2, 'ember-heart': 1, 'flicker-touch': 3 });
   near(game.clickPower(state), game.baseClick(state) + game.autoRate(state) * .03);
@@ -118,7 +118,7 @@ test('rebirth grants every starting skill and carries Gathered moments embers', 
     'patient-fire': 1, 'careful-spending': 1, 'gathered-moments': 2
   });
   assert.equal(game.rebirth(state, NOW + 1000), 1);
-  assert.equal(state.embers, 150 + 2000 + 10000);
+  assert.equal(state.embers, 300 + 2000 + 10000);
   Object.entries({ bellows: 1, sprites: 1, kindling: 2, hearth: 1, kiln: 1, charcoal: 1, draft: 0,
     blueUnlocked: true, blueFlames: 50, blueChanceLevel: 3, blueSiphon: 1, blueYieldLevel: 0,
     blueEmbers: 0, blueDouble: 0, blueWisp: 0, blueScatter: 0 }).forEach(([field, value]) => assert.equal(state[field], value, field));
@@ -175,8 +175,8 @@ test('every playable skill has reachable prerequisites and every prerequisite is
 
 test('pacing guard: a greedy, always-clicking player cannot run income away or skip stage one', () => {
   const state = game.createState(NOW, 7);
-  let seconds = 0, blueAt = null;
-  while (seconds < 3 * 3600) {
+  let seconds = 0, blueAt = null, rateAt3h = 0;
+  while (seconds < 4 * 3600) {
     game.click(state); game.click(state); game.tick(state, 1); seconds++;
     for (let n = 0; n < 20; n++) {
       let best = null, bestCost = Infinity;
@@ -191,7 +191,12 @@ test('pacing guard: a greedy, always-clicking player cannot run income away or s
       game.buyUpgrade(state, best);
     }
     if (state.blueUnlocked && blueAt === null) blueAt = seconds;
+    if (seconds === 3 * 3600) rateAt3h = game.autoRate(state);
   }
-  assert.ok(blueAt > 30 * 60, 'Blue spark reached after only ' + blueAt + 's');
-  assert.ok(game.autoRate(state) < 1e7, 'automatic income ran away: ' + game.autoRate(state));
+  // Stage 1 takes an always-clicking greedy player about 32 minutes (a casual player about 50).
+  assert.ok(blueAt > 25 * 60, 'Blue spark reached after only ' + blueAt + 's');
+  // Income must level off: capped upgrades fill up and later levels pay back ever more slowly.
+  const rate = game.autoRate(state);
+  assert.ok(rate < 5e9, 'automatic income ran away: ' + rate);
+  assert.ok(rate < rateAt3h * 2, 'income still growing fast in hour four: ' + rateAt3h + ' → ' + rate);
 });

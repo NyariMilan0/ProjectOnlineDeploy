@@ -1,6 +1,6 @@
 # Ember Hollow — Handoff
 
-**Version:** 8.0.0 · **Last updated:** 2026-10-25 · **Tests:** 86 passing (`npm test`)
+**Version:** 9.0.0 · **Last updated:** 2026-10-25 · **Tests:** 90 passing (`npm test`)
 
 > **Rule for whoever works on this next (person or AI):** after *every* change, update this file before you finish:
 > bump the version here and in `package.json` (a test fails if they differ), add a line to the changelog,
@@ -18,12 +18,15 @@ Optional: `npm start` serves it at http://127.0.0.1:4173 (separate storage from 
 ## Current state (what exists and works)
 
 **Stage 1 — embers.** Manual clicks only at the start. Items reveal progressively:
-bellows → dry kindling + ember sprite → stone hearth + ember kiln → charcoal bed → chimney draft → Blue flame tab.
+bellows → dry kindling + ember sprite → stone hearth + ember kiln → charcoal bed + coal brazier → smithy forge → ember beacon;
+charcoal → chimney draft → Blue flame tab. Producers live in `PRODUCERS` (`game.js`); all share `producerMultiplier()`.
 
 **Stage 2 — blue flames.** Blue spark costs 100,000 embers and unlocks a 1% blue-flame chance per manual click.
 Upgrades: Cobalt lens (chance), Azure resonance (yield), Blue siphon (automatic rolls, costs embers),
 Azure embers (+25% ember production), Twin flicker (doubled drops), Blue wisp (siphon speed),
 Spark scatter (extra rolls per click, costs embers). Later cards reveal through related purchases.
+Blue-boosted upgrades bought with **embers**: Blue glow (ember production per 100 blue held), Cobalt bellows (click
+strength per blue upgrade level owned), Azure kiln (automation, scaling with blue found this life). Max 10 ranks each.
 
 **Rebirth.** First point needs 1,000 blue flames *held*; each later point costs double, globally.
 Rebirth resets the run; keeps rebirth points, skills, achievements, lifetime stats.
@@ -41,7 +44,9 @@ Rebirth keeper (rebirths when ≥ N points are available; player sets N; off by 
 ~1¼ h, keeper ~2¼ h; with automation, rebirth runs drop from ~3 h to ~1 h.
 
 **Skill tree.** 100 positions in 4 branches (Kindling, Companions, Azure, Time); **30 playable**, 70 "planned".
-Skills cost rebirth points + blue flames. Each card lists its real prerequisites (✓ met / ○ missing, with the
+Skills cost rebirth points + blue flames. **Discovery:** a skill is shown only once all its prerequisites are learned
+(or it has been learned); there is no way to show undiscovered or planned skills. Warm memory (root) now gives +15% all
+ember production and 100 starting embers per rank. Each card lists its real prerequisites (✓ met / ○ missing, with the
 branch when it lives elsewhere) and what it opens; hovering/focusing highlights both. Data lives in `skills.js`; effects in `game.js → effects()`.
 
 **Workshop.** ×1 / ×10 / MAX buy switch (remembered in settings). ×10 needs all ten levels affordable;
@@ -56,7 +61,8 @@ compact numbers, save now, full reset requiring `RESET`); stats dialog; quiet or
 8 h offline progress (up to 19 h with skills); rolling backup save with automatic recovery.
 
 **Pacing (from simulation, `tests/stage2.test.cjs` guards it).** Casual player (clicks 10 min/hour):
-Blue spark ≈ 1¼ h, first rebirth ≈ 2¼ h, later rebirths ≈ 3 h each. Always-clicking player: ≈ 50 min / 1½ h.
+Blue spark ≈ 50 min, first rebirth ≈ 1⅔ h, later rebirths ≈ 1 h. Always-clicking player: ≈ 32 min / 1 h.
+The Blue-spark-to-rebirth stretch was kept near its old length on purpose (player liked that pace).
 
 ## Architecture (where to change things)
 
@@ -88,6 +94,12 @@ New state fields: add to `createState`, read in `sanitize` (missing → 0), rese
 
 ## Changelog
 
+- **9.0.0** — Play-test feedback: three new stage-1 structures (Coal brazier, Smithy forge, Ember beacon) make
+  stage 1 ~35% shorter; three blue-boosted upgrades bought with embers (Blue glow, Cobalt bellows, Azure kiln);
+  Blue siphon (100k, ×3.2) and Spark scatter (×2.8) repriced so the blue stage keeps its pace; Warm memory now
+  +15% ember production per rank; skill tree reveals skills only when their prerequisites are learned (planned
+  slots and the "show future skills" switch removed). Pacing guard now checks that income levels off. 4 new tests.
+
 - **8.0.0** — Stage 3: the Ash Grove (permanent ash currency, 3 generators, 3 gifts to earlier stages) and
   automation (ember steward, blue steward, rebirth keeper with a point target). Third workshop tab with keyboard
   navigation, stats rows, 4 achievements, help text. Simulated pacing + a pacing-guard test. 10 new tests.
@@ -114,11 +126,14 @@ New state fields: add to `createState`, read in `sanitize` (missing → 0), rese
 
 ## Next steps (top = do next)
 
-1. **Play-test stages 1–3** (MAX buying and stewards make this quicker) and tune constants in `UPGRADES`
+1. **Play-test again** — especially the new structures (stage 1 length) and the blue-boosted upgrades;
+   then stages 2–3 (MAX buying and stewards make this quicker) and tune constants in `UPGRADES`
    (`game.js`). `node` simulations in tests (`stage2`/`stage3` pacing guards) flag runaway values.
-2. **Grove visuals:** draw the seedlings/trees/oak in `scene.js` (or a small second canvas in the grove tab) so the
+2. **Scene art:** draw the brazier, forge and beacon in `scene.js` (it only knows sprite/kiln/blue today).
+3. **Grove visuals:** draw the seedlings/trees/oak in `scene.js` (or a small second canvas in the grove tab) so the
    grove visibly grows; add a stoke animation when a steward buys something.
-3. **Skills for stage 3:** use the 70 planned slots — e.g. ash production, cheaper stewards, starting ash, a
+4. **Skills for stage 3:** use the 70 planned slots — e.g. ash production, cheaper stewards, starting ash, a
    "grove memory" branch. Each needs a catalog entry, an `effects()` entry, and a test.
-4. **Big-number support** (mantissa/exponent) — ash and late rebirth costs will approach 9e15 eventually.
-5. Optional: offline automation (see Known issues) and a fourth layer after the grove.
+5. **Big-number support** (a mantissa/exponent type): income already reaches ~1e9/sec late in a run and rises
+   with each rebirth; ash and late rebirth costs will approach the 9e15 limit eventually.
+6. Optional: offline automation (see Known issues) and a fourth layer after the grove.

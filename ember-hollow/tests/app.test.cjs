@@ -269,10 +269,10 @@ test('later rebirth keeps learned skills and applies starter bonuses only to the
   app.click('rebirth-button'); app.element('rebirth-dialog').close('confirm');
   const after = app.saved();
   assert.deepEqual(after.skills, { 'warm-memory': 1 });
-  assert.equal(after.embers, 50); assert.equal(after.runEmbers, 50);
+  assert.equal(after.embers, 100); assert.equal(after.runEmbers, 100); // Warm memory: 100 starting embers per rank
   assert.equal(after.rebirthPoints, 1); assert.equal(after.totalRebirthPoints, 2);
   assert.equal(after.rebirthCount, 2); assert.equal(after.blueFlames, 0);
-  assert.equal(after.totalEarned, initial.totalEarned + 50);
+  assert.equal(after.totalEarned, initial.totalEarned + 100);
   assert.equal(after.manualClicks, initial.manualClicks);
 });
 
@@ -392,23 +392,30 @@ test('export produces a code that imports elsewhere, and the previous progress c
   assert.equal(restored.manualClicks, 12); assert.equal(restored.embers, 77);
 });
 
-test('skill cards list every real prerequisite with its met state and highlight related skills', () => {
+test('skills appear only once their prerequisites are learned, and related skills highlight', () => {
   const app = openApp(veteranSave()); // warm-memory 1, steady-hands 1, two rebirths
   app.click('tree-button');
+  const shown = id => !app.element('skill-' + id).hidden;
   const chipsOf = id => app.element('skill-' + id).children.find(child => child.className === 'skill-requires').children.map(chip => chip.textContent);
+  // Discovered: the root, learned skills, and skills whose prerequisites are all met.
+  for (const id of ['warm-memory', 'steady-hands', 'bellows-memory', 'forest-bond', 'lucky-embers', 'patient-fire']) assert.ok(shown(id), id + ' should show');
+  // Hidden: anything with an unmet prerequisite — there is no switch to reveal them.
+  for (const id of ['ember-heart', 'blazing-start', 'kilncraft', 'charcoal-memory', 'deep-sleep']) assert.ok(!shown(id), id + ' should be hidden');
+  assert.equal(app.element('planned-toggle').events.size, 0);
+  assert.match(app.element('tree-discovered').textContent, /^6 of 30 skills discovered/);
   assert.deepEqual(chipsOf('steady-hands'), ['✓ Warm memory 1']);
-  assert.deepEqual(chipsOf('ember-heart'), ['○ Steady hands 2']);
   assert.deepEqual(chipsOf('forest-bond'), ['✓ Warm memory 1 · Kindling']);
-  assert.deepEqual(chipsOf('charcoal-memory'), ['○ Deep coals 1', '○ Banked coals 1']);
   assert.deepEqual(chipsOf('warm-memory'), ['Starting point · no prerequisites']);
-  const opens = app.element('skill-warm-memory').children.find(child => child.className === 'skill-unlocks').textContent;
-  assert.match(opens, /^Opens: .*Steady hands.*Forest bond.*Lucky embers.*Patient fire/);
-  app.element('skill-ember-heart').events.get('pointerenter')();
-  assert.ok(app.element('skill-steady-hands').classList.contains('is-prereq'));
-  assert.ok(app.element('skill-flicker-touch').classList.contains('is-unlocks'));
-  app.element('skill-ember-heart').events.get('pointerleave')();
-  assert.ok(!app.element('skill-steady-hands').classList.contains('is-prereq'));
+  const opens = id => app.element('skill-' + id).children.find(child => child.className === 'skill-unlocks').textContent;
+  assert.equal(opens('warm-memory'), 'Opens: Steady hands, Forest bond, Lucky embers, Patient fire, 1 undiscovered skill');
+  assert.equal(opens('steady-hands'), 'Opens: Familiar tools, 1 undiscovered skill');
+  app.element('skill-steady-hands').events.get('pointerenter')();
+  assert.ok(app.element('skill-warm-memory').classList.contains('is-prereq'));
+  assert.ok(app.element('skill-bellows-memory').classList.contains('is-unlocks'));
+  app.element('skill-steady-hands').events.get('pointerleave')();
+  assert.ok(!app.element('skill-warm-memory').classList.contains('is-prereq'));
 });
+
 
 test('the ash grove tab appears at the second rebirth and its helpers run from the main loop', () => {
   const base = { ...game.createState(NOW, 21), rebirthCount: 1, savedAt: NOW };

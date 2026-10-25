@@ -15,15 +15,23 @@
     kindling: { field: 'kindling', baseCost: 150, multiplier: 1.75, currency: 'embers', maxLevel: 25 },
     hearth: { field: 'hearth', baseCost: 1000, multiplier: 1.8, currency: 'embers', maxLevel: 25 },
     charcoal: { field: 'charcoal', baseCost: 7500, multiplier: 1.85, currency: 'embers', maxLevel: 25 },
+    // Stage-1 structures after the kiln: each is revealed by owning the previous one.
+    brazier: { field: 'brazier', baseCost: 4000, multiplier: 1.9, currency: 'embers', gainBase: 35, gainGrowth: 1.1, maxLevel: 100 },
+    forge: { field: 'forge', baseCost: 25000, multiplier: 1.95, currency: 'embers', gainBase: 180, gainGrowth: 1.1, maxLevel: 100 },
+    beacon: { field: 'beacon', baseCost: 80000, multiplier: 2, currency: 'embers', gainBase: 700, gainGrowth: 1.1, maxLevel: 100 },
     draft: { field: 'draft', baseCost: 20000, multiplier: 1.95, currency: 'embers', maxLevel: 25 },
     blueUnlock: { field: 'blueUnlocked', baseCost: 100000, multiplier: 1, currency: 'embers', maxLevel: 1 },
     blueChance: { field: 'blueChanceLevel', baseCost: 3, multiplier: 1.65, currency: 'blueFlames', maxLevel: 48 },
     blueYield: { field: 'blueYieldLevel', baseCost: 5, multiplier: 1.7, currency: 'blueFlames', maxLevel: 100 },
-    blueSiphon: { field: 'blueSiphon', baseCost: 25000, multiplier: 2.3, currency: 'embers', maxLevel: 100 },
+    blueSiphon: { field: 'blueSiphon', baseCost: 100000, multiplier: 3.2, currency: 'embers', maxLevel: 100 },
     blueEmbers: { field: 'blueEmbers', baseCost: 10, multiplier: 1.75, currency: 'blueFlames', maxLevel: 25 },
     blueDouble: { field: 'blueDouble', baseCost: 25, multiplier: 1.9, currency: 'blueFlames', maxLevel: 10 },
     blueWisp: { field: 'blueWisp', baseCost: 40, multiplier: 1.85, currency: 'blueFlames', maxLevel: 20 },
-    blueScatter: { field: 'blueScatter', baseCost: 250000, multiplier: 2.2, currency: 'embers', maxLevel: 10 },
+    blueScatter: { field: 'blueScatter', baseCost: 250000, multiplier: 2.8, currency: 'embers', maxLevel: 10 },
+    // Blue-boosted upgrades bought with embers: their strength grows with blue progress.
+    blueGlow: { field: 'blueGlow', baseCost: 150000, multiplier: 3, currency: 'embers', maxLevel: 10 },
+    cobaltBellows: { field: 'cobaltBellows', baseCost: 250000, multiplier: 3, currency: 'embers', maxLevel: 10 },
+    azureKiln: { field: 'azureKiln', baseCost: 400000, multiplier: 3, currency: 'embers', maxLevel: 10 },
     // Stage 3 — the Ash Grove. Bought with ash; never reset by rebirth.
     seedling: { field: 'seedling', baseCost: 10, multiplier: 1.8, currency: 'ash', gainBase: .1, gainGrowth: 1.05, maxLevel: 100, firstFree: true },
     ashTree: { field: 'ashTree', baseCost: 500, multiplier: 2.0, currency: 'ash', gainBase: 5, gainGrowth: 1.05, maxLevel: 100 },
@@ -38,7 +46,10 @@
   const GROVE = ['seedling', 'ashTree', 'emberOak', 'fertileAsh', 'blueLoam', 'canopy', 'stewardEmber', 'stewardBlue', 'rebirthKeeper'];
   const GROVE_UNLOCK_REBIRTHS = 2;
   const STEWARD_SHARE = .25; // the blue steward spends at most this share of held blue flames per purchase
-  const STAGE2 = ['blueEmbers', 'blueDouble', 'blueWisp', 'blueScatter'];
+  const STAGE2 = ['blueEmbers', 'blueDouble', 'blueWisp', 'blueScatter', 'blueGlow', 'cobaltBellows', 'azureKiln'];
+  const STRUCTURES = ['brazier', 'forge', 'beacon'];
+  const PRODUCERS = ['sprite', 'kiln'].concat(STRUCTURES);
+  const BLUE_RUN_LEVELS = ['blueChanceLevel', 'blueYieldLevel', 'blueSiphon', 'blueEmbers', 'blueDouble', 'blueWisp', 'blueScatter'];
   const skillById = new Map(Skills.definitions.map(definition => [definition.id, definition]));
   const effectCache = new WeakMap();
   function integer(value, fallback, upper) {
@@ -73,9 +84,9 @@
     const now = timestamp(nowMs);
     return {
       version: VERSION, embers: 0, bellows: 0, sprites: 0, kiln: 0,
-      kindling: 0, hearth: 0, charcoal: 0, draft: 0,
+      kindling: 0, hearth: 0, charcoal: 0, draft: 0, brazier: 0, forge: 0, beacon: 0,
       blueFlames: 0, blueUnlocked: false, blueChanceLevel: 0, blueYieldLevel: 0, blueSiphon: 0,
-      blueEmbers: 0, blueDouble: 0, blueWisp: 0, blueScatter: 0,
+      blueEmbers: 0, blueDouble: 0, blueWisp: 0, blueScatter: 0, blueGlow: 0, cobaltBellows: 0, azureKiln: 0,
       ash: 0, lifetimeAsh: 0, seedling: 0, ashTree: 0, emberOak: 0, fertileAsh: 0, blueLoam: 0, canopy: 0,
       stewardEmber: 0, stewardBlue: 0, rebirthKeeper: 0,
       autoEmber: true, autoBlue: true, autoRebirth: false, autoRebirthTarget: 1, autoRebirths: 0,
@@ -97,6 +108,7 @@
     clean.kiln = input.version >= 2 ? integer(input.kiln, 0, MAX_LEVEL) : 0;
     if (input.version >= VERSION) {
       for (const field of ['kindling', 'hearth', 'charcoal', 'draft']) clean[field] = integer(input[field], 0, 25);
+      for (const field of STRUCTURES) clean[field] = integer(input[field], 0, MAX_LEVEL);
     }
     clean.totalEarned = Math.max(clean.embers, amount(input.totalEarned, 0));
     clean.manualClicks = integer(input.manualClicks, 0);
@@ -161,6 +173,7 @@
     const rank = id => integer(state.skills && state.skills[id], 0, 5);
     const value = Object.freeze({
       emberHeart: 1 + .25 * rank('ember-heart'),
+      warmMemory: 1 + .15 * rank('warm-memory'),
       flickerTouch: .01 * rank('flicker-touch'),
       rebirthEcho: .02 * rank('rebirth-echo'),
       charcoalBonus: .05 * rank('deep-coals'),
@@ -183,7 +196,7 @@
       blueYieldMultiplier: 1 + .2 * rank('blue-resonance'),
       costMultiplier: 1 - .02 * rank('careful-spending') - .02 * rank('frugal-fire'),
       offlineBonus: 3600 * rank('long-dreams') + 7200 * rank('deep-sleep'),
-      startingEmbers: 50 * rank('warm-memory') + 1000 * rank('blazing-start'),
+      startingEmbers: 100 * rank('warm-memory') + 1000 * rank('blazing-start'),
       startingBellows: rank('bellows-memory'),
       startingSprites: rank('sprite-memory'),
       startingBlueUnlocked: rank('spark-memory') > 0
@@ -196,19 +209,31 @@
   function emberMultiplier(state) {
     const effect = effects(state);
     return (1 + .1 * (state.draft || 0)) * (1 + .25 * (state.blueEmbers || 0)) * effect.emberHeart * (1 + effect.rebirthEcho * (state.rebirthCount || 0)) *
-      (1 + .25 * (state.fertileAsh || 0));
+      (1 + .25 * (state.fertileAsh || 0)) * effect.warmMemory * blueGlowMultiplier(state);
   }
+  // Blue glow: +5% ember production per rank for every 100 blue flames held (counts up to 1,000).
+  function blueGlowMultiplier(state) { return 1 + .05 * (state.blueGlow || 0) * Math.min(1000, state.blueFlames || 0) / 100; }
+  // Azure kiln: up to +50% automatic production per rank, at full strength after 1,000 blue flames found this life.
+  function azureKilnMultiplier(state) { return 1 + .5 * (state.azureKiln || 0) * Math.min(1, (state.runBlue || 0) / 1000); }
+  function blueLevelCount(state) { return BLUE_RUN_LEVELS.reduce((sum, field) => sum + (state[field] || 0), 0); }
+  // Cobalt bellows: +2% click strength per rank for every blue upgrade level owned this life.
+  function cobaltMultiplier(state) { return 1 + .02 * (state.cobaltBellows || 0) * blueLevelCount(state); }
   function charcoalPerRank(state) { return .25 + effects(state).charcoalBonus; }
   function baseClick(state) {
-    return Math.min(MAX, (1 + state.bellows) * (1 + .2 * (state.kindling || 0)) * emberMultiplier(state) * effects(state).clickMultiplier);
+    return Math.min(MAX, (1 + state.bellows) * (1 + .2 * (state.kindling || 0)) * emberMultiplier(state) * effects(state).clickMultiplier * cobaltMultiplier(state));
+  }
+  // Multiplier for one producer's gains, shared by productionRate and upgradeGain.
+  function producerMultiplier(state, kind) {
+    const effect = effects(state);
+    const own = kind === 'sprite' ? effect.spriteMultiplier : kind === 'kiln' ? effect.kilnMultiplier * (1 + charcoalPerRank(state) * (state.charcoal || 0)) : 1;
+    return effect.autoMultiplier * (1 + .15 * (state.hearth || 0)) * emberMultiplier(state) * azureKilnMultiplier(state) * own;
   }
   function productionRate(state, kind) {
-    if (kind !== 'sprite' && kind !== 'kiln') throw new TypeError('Unknown producer: ' + kind);
-    const effect = effects(state), level = kind === 'sprite' ? state.sprites : state.kiln;
-    return Math.min(MAX, rates[kind][level] * effect.autoMultiplier * (1 + .15 * (state.hearth || 0)) * emberMultiplier(state) *
-      (kind === 'sprite' ? effect.spriteMultiplier : effect.kilnMultiplier * (1 + charcoalPerRank(state) * (state.charcoal || 0))));
+    if (!PRODUCERS.includes(kind)) throw new TypeError('Unknown producer: ' + kind);
+    const level = kind === 'sprite' ? state.sprites : state[kind] || 0;
+    return Math.min(MAX, rates[kind][level] * producerMultiplier(state, kind));
   }
-  function autoRate(state) { return add(productionRate(state, 'sprite'), productionRate(state, 'kiln')); }
+  function autoRate(state) { return PRODUCERS.reduce((sum, kind) => add(sum, productionRate(state, kind)), 0); }
   // Flicker touch adds a slice of automatic production to every manual click.
   function clickPower(state) { return Math.min(MAX, baseClick(state) + autoRate(state) * effects(state).flickerTouch); }
   function blueChance(state) { return state.blueUnlocked ? Math.min(.25, .01 + .005 * state.blueChanceLevel + effects(state).blueChanceBonus) : 0; }
@@ -297,7 +322,9 @@
       if (state[kind] > 0) return true;
       if (kind === 'blueEmbers') return state.blueChanceLevel > 0 || state.blueYieldLevel > 0;
       if (kind === 'blueDouble') return state.blueYieldLevel > 0;
-      if (kind === 'blueWisp') return state.blueSiphon > 0;
+      if (kind === 'blueWisp' || kind === 'azureKiln') return state.blueSiphon > 0;
+      if (kind === 'blueGlow') return true;
+      if (kind === 'cobaltBellows') return state.blueChanceLevel > 0;
       return state.blueChanceLevel >= 3; // blueScatter
     }
     if (kind.startsWith('blue') && kind !== 'blueUnlock') return state.blueUnlocked;
@@ -306,7 +333,9 @@
     if (owned > 0 || owned === true) return true;
     if (kind === 'sprite' || kind === 'kindling') return state.bellows > 0 || state.sprites > 0 || state.kiln > 0;
     if (kind === 'kiln' || kind === 'hearth') return state.sprites > 0;
-    if (kind === 'charcoal') return state.kiln > 0;
+    if (kind === 'charcoal' || kind === 'brazier') return state.kiln > 0;
+    if (kind === 'forge') return state.brazier > 0;
+    if (kind === 'beacon') return state.forge > 0;
     if (kind === 'draft') return state.charcoal > 0;
     if (kind === 'blueUnlock') return isBlueStageVisible(state);
     return state.blueUnlocked;
@@ -324,8 +353,7 @@
     const effect = effects(state);
     const ember = emberMultiplier(state);
     if (kind === 'bellows') return Math.min(MAX, (1 + .2 * (state.kindling || 0)) * ember * effect.clickMultiplier);
-    if (kind === 'sprite') return Math.min(MAX, gains[kind][level] * effect.autoMultiplier * effect.spriteMultiplier * (1 + .15 * (state.hearth || 0)) * ember);
-    if (kind === 'kiln') return Math.min(MAX, gains[kind][level] * effect.autoMultiplier * effect.kilnMultiplier * (1 + charcoalPerRank(state) * (state.charcoal || 0)) * (1 + .15 * (state.hearth || 0)) * ember);
+    if (PRODUCERS.includes(kind)) return Math.min(MAX, gains[kind][level] * producerMultiplier(state, kind));
     if (kind === 'kindling') return baseClick(state) * .2 / (1 + .2 * state.kindling);
     if (kind === 'hearth') return autoRate(state) * .15 / (1 + .15 * state.hearth);
     if (kind === 'charcoal') return productionRate(state, 'kiln') * charcoalPerRank(state) / (1 + charcoalPerRank(state) * state.charcoal);
@@ -334,6 +362,9 @@
     if (kind === 'blueDouble') return Math.max(0, Math.min(.05, .75 - blueDoubleChance(state)));
     if (kind === 'blueWisp') return state.blueSiphon * .5 * effect.siphonMultiplier;
     if (kind === 'blueScatter') return 1;
+    if (kind === 'blueGlow') return .05 * Math.min(1000, state.blueFlames || 0) / 100; // added ember multiplier now
+    if (kind === 'cobaltBellows') return .02 * blueLevelCount(state);
+    if (kind === 'azureKiln') return .5 * Math.min(1, (state.runBlue || 0) / 1000);
     if (kind === 'seedling' || kind === 'ashTree' || kind === 'emberOak') return Math.min(MAX, gains[kind][level] * (1 + .25 * (state.canopy || 0)) * (1 + .05 * (state.rebirthCount || 0)));
     if (kind === 'fertileAsh') return .5;
     if (kind === 'blueLoam') return .2;
@@ -420,10 +451,10 @@
     const effect = effects(state), carried = Math.floor(state.embers * effect.carryFraction);
     const blueStart = effect.startingBlueUnlocked;
     Object.assign(state, { embers: 0, bellows: effect.startingBellows, sprites: effect.startingSprites, kiln: effect.startingKiln,
-      kindling: effect.startingKindling, hearth: effect.startingHearth, charcoal: effect.startingCharcoal, draft: 0,
+      kindling: effect.startingKindling, hearth: effect.startingHearth, charcoal: effect.startingCharcoal, draft: 0, brazier: 0, forge: 0, beacon: 0,
       blueFlames: blueStart ? effect.startingBlue : 0, blueUnlocked: blueStart,
       blueChanceLevel: blueStart ? effect.startingLens : 0, blueYieldLevel: 0, blueSiphon: blueStart ? effect.startingSiphon : 0,
-      blueEmbers: 0, blueDouble: 0, blueWisp: 0, blueScatter: 0,
+      blueEmbers: 0, blueDouble: 0, blueWisp: 0, blueScatter: 0, blueGlow: 0, cobaltBellows: 0, azureKiln: 0,
       runEmbers: 0, runBlue: 0, runClicks: 0, runSeconds: 0, blueRollProgress: 0, savedAt: timestamp(nowMs) });
     grant(state, effect.startingEmbers + carried);
     state.bestBellows = Math.max(state.bestBellows, state.bellows); state.bestSprites = Math.max(state.bestSprites, state.sprites);
@@ -431,8 +462,8 @@
     return quote.points;
   }
   // ----- Automation (stage 3). Runs while the game is open; offline progress is unchanged. -----
-  const EMBER_AUTO = ['bellows', 'kindling', 'sprite', 'hearth', 'kiln', 'charcoal', 'draft'];
-  const BLUE_AUTO = ['blueUnlock', 'blueChance', 'blueYield', 'blueEmbers', 'blueDouble', 'blueSiphon', 'blueWisp', 'blueScatter'];
+  const EMBER_AUTO = ['bellows', 'kindling', 'sprite', 'hearth', 'kiln', 'charcoal', 'brazier', 'forge', 'beacon', 'draft'];
+  const BLUE_AUTO = ['blueUnlock', 'blueChance', 'blueYield', 'blueEmbers', 'blueDouble', 'blueSiphon', 'blueWisp', 'blueScatter', 'blueGlow', 'cobaltBellows', 'azureKiln'];
   // One steward activation: buy the cheapest allowed upgrade repeatedly (up to 25 purchases).
   function stewardPass(state, kinds, allowed) {
     let bought = 0;
@@ -522,6 +553,7 @@
   return Object.freeze({ VERSION, OFFLINE_LIMIT, MAX_LEVEL, createState, sanitize, effects, offlineLimit,
     click, clickPower, baseClick, emberMultiplier, productionRate, autoRate, blueChance, blueYield, blueRollRate, blueDoubleChance, clickRolls,
     upgradeCurrency, upgradeLevel, bulkQuote, buyBulk,
+    blueGlowMultiplier, azureKilnMultiplier, cobaltMultiplier, blueLevelCount, PRODUCERS: Object.freeze(PRODUCERS.slice()),
     isGroveVisible, groveRate, ashRate, stewardInterval, automate, setAutomation, GROVE_KINDS: Object.freeze(GROVE.slice()), GROVE_UNLOCK_REBIRTHS, STEWARD_SHARE, UPGRADE_KINDS: Object.freeze(Object.keys(UPGRADES)), getUpgradeCost, upgradeGain, isUpgradeVisible, isBlueStageVisible, isRebirthVisible, buyUpgrade, tick, getRebirthInfo, rebirth,
     getSkillInfo, buySkill, serialize, restore });
 });

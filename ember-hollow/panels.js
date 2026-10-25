@@ -1,14 +1,14 @@
 /* Dialogs and progression panels; all purchases use the tested game economy. */
 (function () {
   'use strict';
-  const BLUE_KINDS = ['blueUnlock', 'blueChance', 'blueYield', 'blueEmbers', 'blueDouble', 'blueSiphon', 'blueWisp', 'blueScatter'];
+  const BLUE_KINDS = ['blueUnlock', 'blueChance', 'blueYield', 'blueEmbers', 'blueDouble', 'blueSiphon', 'blueWisp', 'blueScatter', 'blueGlow', 'cobaltBellows', 'azureKiln'];
   const GROVE_KINDS = ['seedling', 'ashTree', 'emberOak', 'fertileAsh', 'blueLoam', 'canopy', 'stewardEmber', 'stewardBlue', 'rebirthKeeper'];
   const GROVE_LABELS = { seedling: 'Grow cinder seedling', ashTree: 'Grow ashwood tree', emberOak: 'Grow ember oak', fertileAsh: 'Scatter fertile ash',
     blueLoam: 'Enrich blue loam', canopy: 'Grow warm canopy', stewardEmber: 'Upgrade ember steward', stewardBlue: 'Upgrade blue steward', rebirthKeeper: 'Hire rebirth keeper' };
   const TABS = ['embers', 'blue', 'grove'];
   const CURRENCY_NAMES = { embers: 'embers', blueFlames: 'blue flames', ash: 'ash' };
   const BLUE_LABELS = { blueUnlock: 'Unlock blue flames', blueChance: 'Upgrade blue flame chance', blueYield: 'Upgrade blue flame yield',
-    blueSiphon: 'Upgrade blue siphon', blueEmbers: 'Upgrade azure embers', blueDouble: 'Upgrade twin flicker', blueWisp: 'Upgrade blue wisp', blueScatter: 'Upgrade spark scatter' };
+    blueSiphon: 'Upgrade blue siphon', blueGlow: 'Upgrade blue glow', cobaltBellows: 'Upgrade cobalt bellows', azureKiln: 'Upgrade azure kiln', blueEmbers: 'Upgrade azure embers', blueDouble: 'Upgrade twin flicker', blueWisp: 'Upgrade blue wisp', blueScatter: 'Upgrade spark scatter' };
   class EmberPanels {
     constructor(options) {
       this.options = options;
@@ -54,9 +54,6 @@
       });
       this.$('rebirth-dialog').addEventListener('close', () => {
         if (this.$('rebirth-dialog').returnValue === 'confirm') o.rebirth();
-      });
-      this.$('planned-toggle').addEventListener('change', event => {
-        this.$('skill-branches').classList.toggle('future-nodes-shown', event.target.checked);
       });
       BLUE_KINDS.concat(GROVE_KINDS).forEach(kind => {
         this.$('buy-' + kind).addEventListener('click', () => o.buy(kind));
@@ -188,7 +185,8 @@
         const heading = document.createElement('h3'); heading.textContent = branch.title;
         const description = document.createElement('p'); description.className = 'branch-description'; description.textContent = branch.description;
         column.append(heading, description);
-        this.Skills.definitions.filter(skill => skill.branch === branch.id).forEach(skill => {
+        // Only real skills are built; planned slots stay out of the tree entirely.
+        this.Skills.definitions.filter(skill => skill.branch === branch.id && skill.active).forEach(skill => {
           const node = document.createElement('article'); node.id = 'skill-' + skill.id;
           node.className = 'skill-node' + (skill.active ? '' : ' future');
           const title = document.createElement('h4'); title.className = 'skill-title'; title.textContent = skill.title;
@@ -212,14 +210,15 @@
           }
           const opens = this.Skills.definitions.filter(other => other.active && other.requires.some(r => r.id === skill.id));
           const unlocks = document.createElement('p'); unlocks.className = 'skill-unlocks';
-          unlocks.textContent = opens.length ? 'Opens: ' + opens.map(other => other.title).join(', ') : '';
+          // Filled in by render(): only discovered skills are named.
           const button = document.createElement('button'); button.type = 'button'; button.className = 'skill-buy buy-button';
           button.disabled = true; button.textContent = skill.active ? 'LEARN SKILL' : 'FUTURE SKILL';
           if (skill.active) button.addEventListener('click', () => this.options.buySkill(skill.id));
           if (skill.active) node.append(title, level, detail, requires, unlocks, cost, reason, button);
           else node.append(title, level, detail, cost, reason, button);
           column.appendChild(node);
-          this.nodes.set(skill.id, { node, level, cost, reason, button, chips, signature: '' });
+          this.nodes.set(skill.id, { node, level, cost, reason, button, chips, unlocks, opens, signature: '' });
+          node.hidden = true;
           if (skill.active) {
             node.tabIndex = -1;
             const on = () => this.highlight(skill.id, true), off = () => this.highlight(skill.id, false);
@@ -331,6 +330,9 @@
       this.text('blueDouble-benefit', f(Game.blueDoubleChance(s) * 100) + '% doubled drops · +5% per rank');
       this.text('blueWisp-benefit', '+' + f((s.blueWisp || 0) * 50) + '% siphon speed · +' + f(Game.upgradeGain(s, 'blueWisp')) + ' rolls/sec next');
       this.text('blueScatter-benefit', f(Game.clickRolls(s)) + ' blue rolls per click · +1 per rank');
+      this.text('blueGlow-benefit', '+' + f((Game.blueGlowMultiplier(s) - 1) * 100) + '% ember production now · +5% per 100 blue held, per rank (up to 1,000 held)');
+      this.text('cobaltBellows-benefit', '+' + f((Game.cobaltMultiplier(s) - 1) * 100) + '% click strength now · +2% per blue upgrade level (' + Game.blueLevelCount(s) + ' owned), per rank');
+      this.text('azureKiln-benefit', '+' + f((Game.azureKilnMultiplier(s) - 1) * 100) + '% automatic production now · up to +50% per rank, full after 1,000 blue found this life');
       const info = Game.getRebirthInfo(s);
       Dom.disabled(this.$('rebirth-button'), !info.canRebirth);
       this.text('rebirth-offer', info.points ? '+' + f(info.points) + ' rebirth point' + (info.points === 1 ? '' : 's') + ' available' : 'Gather ' + f(info.remaining) + ' more blue flames');
@@ -365,13 +367,18 @@
       if (force || this.$('skill-dialog').open) {
         this.text('tree-points', f(s.rebirthPoints)); this.text('tree-blue', f(s.blueFlames));
         this.text('tree-unlocked-note', s.rebirthCount > 0 ? 'Permanent skills survive every rebirth. Starter bonuses apply on your next rebirth.' : 'Preview the tree. Complete your first rebirth to learn permanent skills.');
-        this.Skills.definitions.forEach(skill => {
+        // A skill is discovered once all of its prerequisites are learned (or it has been learned itself).
+        const discovered = skill => (s.skills[skill.id] || 0) > 0 || skill.requires.every(r => (s.skills[r.id] || 0) >= r.level);
+        const active = this.Skills.definitions.filter(skill => skill.active);
+        const found = active.filter(discovered).length;
+        this.text('tree-discovered', found + ' of ' + active.length + ' skills discovered' + (found < active.length ? ' · learn skills to reveal the rest' : ' · the whole tree is known'));
+        active.forEach(skill => {
           const nodes = this.nodes.get(skill.id);
-          if (!skill.active) {
-            if (nodes.signature) return;
-            nodes.signature = 'future'; nodes.level.textContent = 'PLANNED';
-            nodes.cost.textContent = 'A future branch of the hollow.'; nodes.reason.textContent = 'Not available in this version.'; return;
-          }
+          const shown = discovered(skill);
+          Dom.hidden(nodes.node, !shown);
+          if (!shown) return;
+          const named = nodes.opens.filter(discovered), hiddenCount = nodes.opens.length - named.length;
+          Dom.text(nodes.unlocks, nodes.opens.length ? 'Opens: ' + named.map(other => other.title).concat(hiddenCount ? [hiddenCount + ' undiscovered skill' + (hiddenCount === 1 ? '' : 's')] : []).join(', ') : '');
           const item = Game.getSkillInfo(s, skill.id);
           const met = nodes.chips.map(entry => (s.skills[entry.requirement.id] || 0) >= entry.requirement.level ? 1 : 0).join('');
           const signature = [item.level, item.maxed, item.blueCost, item.pointCost, item.lockedReason, item.canBuy, o.preferences().compact, met].join('|');

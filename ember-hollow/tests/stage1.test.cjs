@@ -81,7 +81,7 @@ test('version three saves retain blue progression, rebirth records, permanent sk
   assert.deepEqual(state.skills, old.skills);
   for (const field of ['kindling', 'hearth', 'charcoal', 'draft']) assert.equal(state[field], 0);
   assert.equal(game.isBlueStageVisible(state), true); assert.equal(game.isUpgradeVisible(state, 'kiln'), true);
-  near(game.productionRate(state, 'sprite'), 1.66 * 1.15);
+  near(game.productionRate(state, 'sprite'), 1.66 * 1.15 * 1.15); // Forest bond × Warm memory
 });
 
 test('new stage levels persist through saves and reset on rebirth without a free sprite', () => {
@@ -104,6 +104,6 @@ test('a permanent sprite starter grants the unlock only on the next rebirth', ()
   assert.equal(state.sprites, 0); assert.equal(game.autoRate(state), 0);
   state.blueFlames = 1000;
   assert.equal(game.rebirth(state, NOW), 1);
-  assert.equal(state.sprites, 1); near(game.productionRate(state, 'sprite'), .5 * 1.3);
+  assert.equal(state.sprites, 1); near(game.productionRate(state, 'sprite'), .5 * 1.3 * 1.15);
   assert.equal(game.isUpgradeVisible(state, 'kiln'), true);
 });
